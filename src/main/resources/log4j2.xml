@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration status="INFO" monitorInterval="300">
+    <Properties>
+        <property name="logBasePath">${ctx:log.root}</property>
+        <property name="console_log_pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%X{LOGGER_MODULE}][%X{LOGGER_CATEGORY}][%X{LOGGER_SUBCATEGORY}][%X{LOGGER_FILTER1}][%X{LOGGER_FILTER2}]%m%n</property>
+        <property name="log_pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%X{LOGGER_MODULE}][%X{LOGGER_CATEGORY}][%X{LOGGER_SUBCATEGORY}][%X{LOGGER_FILTER1}][%X{LOGGER_FILTER2}]%m%n</property>
+        <property name="output_log_level">DEBUG</property>
+        <property name="console_print_level">DEBUG</property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${console_log_pattern}"/>
+        </Console>
+
+        <!--RollingFile节点用来定义超过指定日志文件大小自动删除旧的，创建新的的Appender设置滚动策略-->
+        <RollingFile name="ERROR-APPENDER" fileName="${logBasePath}/logs/common-error.log" filePattern="${logBasePath}/logs/common-error-%d{yyyy-MM-dd}.log" append="true">
+            <PatternLayout pattern="${log_pattern}"/>
+            <Filters>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <!--设置滚动策略-->
+            <Policies>
+                <!--基于时间的滚动策略，interval属性用来指定多久滚动一次,默认是1 hour-->
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+            <!--用来指定同一个文件夹下最多有几个日志文件时开始删除最旧的，创建新的(通过max属性)。-->
+            <DefaultRolloverStrategy>
+                <Delete basePath="${logBasePath}/logs">
+                    <IfFileName glob="common-error*.log"/>
+                    <IfLastModified age="60d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="DEFAULT-APPENDER" fileName="${logBasePath}/logs/common-default.log" filePattern="${logBasePath}/logs/common-default-%d{yyyy-MM-dd}.log" append="true">
+            <PatternLayout pattern="${log_pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${logBasePath}/logs">
+                    <IfFileName glob="common-default*.log"/>
+                    <IfLastModified age="60d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <RollingFile name="JVM-MONITOR-DIGEST-APPENDER" fileName="${logBasePath}/logs/jvm-monitor-digest.log" filePattern="${logBasePath}/logs/jvm-monitor-digest-%d{yyyy-MM-dd}.log" append="true">
+            <PatternLayout pattern="${log_pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${logBasePath}/logs">
+                    <IfFileName glob="jvm-monitor-digest*.log"/>
+                    <IfLastModified age="60d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <AsyncLogger name="STDOUT" level="INFO" additivity="false">
+            <appender-ref ref="Console"/>
+        </AsyncLogger>
+        <AsyncLogger name="STDERR" level="ERROR" additivity="false">
+            <appender-ref ref="Console"/>
+        </AsyncLogger>
+        <AsyncLogger name="org.springframework" level="WARN" additivity="true">
+            <appender-ref ref="ERROR-APPENDER"/>
+            <appender-ref ref="Console"/>
+        </AsyncLogger>
+        <AsyncLogger name="java.sql" level="ERROR" additivity="false">
+            <appender-ref ref="ERROR-APPENDER"/>
+            <appender-ref ref="Console"/>
+        </AsyncLogger>
+        <AsyncLogger name="com.mybatis" level="WARN" additivity="true">
+            <appender-ref ref="ERROR-APPENDER"/>
+            <appender-ref ref="Console"/>
+        </AsyncLogger>
+        <AsyncLogger name="JVM-MONITOR-DIGEST-LOGGER" level="INFO" additivity="false">
+            <appender-ref ref="JVM-MONITOR-DIGEST-APPENDER"/>
+        </AsyncLogger>
+        <AsyncLogger name="com.qinglin.qlinvediomonitor" level="INFO" additivity="false">
+            <appender-ref ref="APP-DEFAULT-APPENDER"/>
+            <appender-ref ref="Console"/>
+        </AsyncLogger>
+        <root level="INFO">
+            <appender-ref ref="DEFAULT-APPENDER"/>
+            <appender-ref ref="ERROR-APPENDER"/>
+            <appender-ref ref="Console"/>
+        </root>
+    </Loggers>
+</configuration>

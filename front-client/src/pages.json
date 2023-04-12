@@ -1,0 +1,55 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/tabbar/tabbar-1/tabbar-1",
+      "style": {}
+    },
+    {
+      "path": "pages/tabbar/tabbar-5/tabbar-5",
+      "style": {}
+    },
+    {
+      "path": "pages/dynamic/index",
+      "style": {
+        "navigationBarTitleText": "动态瞬间"
+      }
+    },
+    {
+      "path": "pages/dynamic/detail",
+      "style": {
+        "navigationBarTitleText": "视频详情"
+      }
+          }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Qlin监控",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "borderStyle": "black",
+    "color": "#8F8F94",
+    "selectedColor": "#1BCF8A",
+    "list": [
+      {
+        "pagePath": "pages/tabbar/tabbar-1/tabbar-1",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/homeactive.png",
+        "text": "监控"
+      },
+      {
+        "pagePath": "pages/tabbar/tabbar-5/tabbar-5",
+        "iconPath": "static/tabbar/me.png",
+        "selectedIconPath": "static/tabbar/meactive.png",
+        "text": "我"
+      }
+    ]
+  }
+}
