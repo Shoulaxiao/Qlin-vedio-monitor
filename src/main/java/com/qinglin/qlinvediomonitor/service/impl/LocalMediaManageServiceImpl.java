@@ -29,7 +29,7 @@ public class LocalMediaManageServiceImpl extends AbstractMediaManage {
 
     @Override
     public String upLoad(InputStream input) throws MonitorException {
-        String url = null;
+        String url;
         try {
             MultipartFile file = new MockMultipartFile("temp.jpg", "temp.jpg", "temp.jpg", input);
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -37,7 +37,7 @@ public class LocalMediaManageServiceImpl extends AbstractMediaManage {
             File filePath = new File(realPath);
             if (!filePath.exists() && !filePath.isDirectory()) {
                 boolean mkdirs = filePath.mkdirs();
-                System.out.println(mkdirs);
+                log.info("mkdir={}",mkdirs);
             }
             String uuid = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
             String fileName = uuid + "-" + file.getOriginalFilename();

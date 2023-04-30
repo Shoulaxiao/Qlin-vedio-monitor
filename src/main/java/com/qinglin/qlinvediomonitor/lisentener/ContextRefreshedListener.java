@@ -1,6 +1,7 @@
 package com.qinglin.qlinvediomonitor.lisentener;
 
 import com.qinglin.qlinvediomonitor.stream.VideoStream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -13,6 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Slf4j
 public class ContextRefreshedListener implements ApplicationListener<ContextRefreshedEvent> {
 
     ExecutorService executorService = new ThreadPoolExecutor(1, 2, 10L, TimeUnit.MINUTES, new LinkedBlockingDeque<>(8));
@@ -26,10 +28,11 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
     /**
      * 本地MP4文件的完整路径
      */
-    private static final String MP4_FILE_PATH = "/home/shoulaxiao/Videos/DASS-070-C.mp4";
+    private static final String MP4_FILE_PATH = "/Users/shoulaxiao/Movies/Normal.People.S01E01.WEBrip.720P.mp4";
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        log.info("开始直播推流");
         executorService.submit(() -> localVideoStreamer.pushStream(MP4_FILE_PATH, stmpRecordAddress));
     }
 }

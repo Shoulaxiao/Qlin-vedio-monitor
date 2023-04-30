@@ -1,7 +1,16 @@
 # Qlin-vedio-monitor
 摄像头监控系统
 
-
+## 安装STMP服务器
+* 拉取nginx-stmp镜像
+```docker
+docker pull alqutami/rtmp-hls
+```
+* 运行nginx-stmp容器。$HOME/Documents/nginx/nginx.conf 需要替换为自己电脑上的路径
+```docker
+docker run -d --name nginx-hls -p 1935:1935 -p 8887:8887 -v $HOME/Documents/nginx/nginx.conf:/etc/nginx/nginx.conf alqutami/rtmp-hls
+```
+nginx.conf 的配置文件如下：
 ```
 worker_processes  auto;
 #error_log  logs/error.log;

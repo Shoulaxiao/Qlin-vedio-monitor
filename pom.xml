@@ -11,7 +11,7 @@
     <groupId>com.qinglin</groupId>
     <artifactId>Qlin-vedio-monitor</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>war</packaging>
     <name>Qlin-vedio-monitor</name>
     <description>Qlin-vedio-monitor</description>
     <properties>
@@ -23,7 +23,7 @@
         <commons-lang3.version>3.9</commons-lang3.version>
         <druid.version>1.1.22</druid.version>
         <mybatis-plus.version>3.4.2</mybatis-plus.version>
-        <javacv.version>1.4.3</javacv.version>
+        <javacv.version>1.4.4</javacv.version>
     </properties>
     <dependencies>
         <dependency>
@@ -86,6 +86,12 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${mybatis-plus.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mybatis-plus-extension</artifactId>
+                    <groupId>com.baomidou</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -119,28 +125,49 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
         </dependency>
 
+        <!--        <dependency>-->
+        <!--            <groupId>org.bytedeco</groupId>-->
+        <!--            <artifactId>javacv</artifactId>-->
+        <!--            <version>1.4.3</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.bytedeco.javacpp-presets</groupId>-->
+        <!--            <artifactId>ffmpeg-platform</artifactId>-->
+        <!--            <version>4.0.2-1.4.3</version>-->
+        <!--        </dependency>-->
+        <!--        &lt;!&ndash;项目在本地window用FFmpeg-windows-x86_64，项目在Linux用FFmpeg-linux-x86_64&ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.github.hoary.ffmpeg</groupId>-->
+        <!--            <artifactId>FFmpeg-windows-x86_64</artifactId>-->
+        <!--            <version>2.0.1.1</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.github.hoary.ffmpeg</groupId>-->
+        <!--            <artifactId>FFmpeg-macosx-x86_64</artifactId>-->
+        <!--            <version>2.0.1.1</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.github.hoary.ffmpeg</groupId>-->
+        <!--            <artifactId>FFmpeg-linux-x86_64</artifactId>-->
+        <!--            <version>2.0.1.1</version>-->
+        <!--        </dependency>-->
+
+
         <dependency>
             <groupId>org.bytedeco</groupId>
-            <artifactId>javacv</artifactId>
+            <artifactId>javacv-platform</artifactId>
             <version>${javacv.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bytedeco.javacpp-presets</groupId>
-            <artifactId>ffmpeg-platform</artifactId>
-            <version>4.0.2-1.4.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

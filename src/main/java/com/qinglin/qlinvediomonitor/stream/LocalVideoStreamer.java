@@ -5,6 +5,7 @@ import org.bytedeco.javacpp.avcodec;
 import org.bytedeco.javacpp.avformat;
 import org.bytedeco.javacv.*;
 import org.springframework.stereotype.Component;
+
 //docker run -d --name nginx-hls -p 1935:1935 -p 8887:8887 -v $HOME/Documents/nginx/nginx.conf:/etc/nginx/nginx.conf alqutami/rtmp-hls
 @Slf4j
 @Component("localVideoStreamer")
@@ -40,7 +41,6 @@ public class LocalVideoStreamer extends AbstractVideoStreamer implements VideoSt
                 avcodec.AVCodecParameters avCodecParameters = avStream.codecpar();
                 log.info("流的索引[{}]，编码器类型[{}]，编码器ID[{}]", i, avCodecParameters.codec_type(), avCodecParameters.codec_id());
             }
-
             // 实例化FFmpegFrameRecorder，将SRS的推送地址传入
             recorder = initFrameRecorder(grabber, targetAddress, frameRate);
             doStartPush(frameRate, grabber, recorder);
@@ -49,7 +49,6 @@ public class LocalVideoStreamer extends AbstractVideoStreamer implements VideoSt
         } finally {
             close(recorder, grabber);
         }
-
     }
 
     private void doStartPush(int frameRate, FFmpegFrameGrabber grabber, FFmpegFrameRecorder recorder) throws FrameRecorder.Exception, FrameGrabber.Exception {
@@ -72,17 +71,14 @@ public class LocalVideoStreamer extends AbstractVideoStreamer implements VideoSt
         // 持续从视频源取帧
         while (null != (frame = grabber.grab())) {
             videoTS = 1000 * (System.currentTimeMillis() - startTime);
-//            log.warn("videoTS={}",videoTS);
             // 时间戳
             if (0 != grabber.getTimestamp()) {
                 recorder.setTimestamp(grabber.getTimestamp());
             }
-//            recorder.setTimestamp(videoTS);
-            // 有图像，就把视频帧加一
+            // recorder.setTimestamp(videoTS);
             if (null != frame.image) {
                 videoFrameNum++;
             }
-            // 有声音，就把音频帧加一
             if (null != frame.samples) {
                 audioFrameNum++;
             }
