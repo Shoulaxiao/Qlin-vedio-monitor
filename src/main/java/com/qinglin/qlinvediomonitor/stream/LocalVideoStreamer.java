@@ -6,10 +6,15 @@ import org.bytedeco.javacpp.avformat;
 import org.bytedeco.javacv.*;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
 //docker run -d --name nginx-hls -p 1935:1935 -p 8887:8887 -v $HOME/Documents/nginx/nginx.conf:/etc/nginx/nginx.conf alqutami/rtmp-hls
 @Slf4j
 @Component("localVideoStreamer")
 public class LocalVideoStreamer extends AbstractVideoStreamer implements VideoStream {
+
+    @Resource
+    private FramerHandler framerHandler;
 
     @Override
     public void pushStream(String source, String targetAddress) {

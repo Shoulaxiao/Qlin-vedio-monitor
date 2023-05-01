@@ -2,7 +2,7 @@
   <view class="page-body">
     <view class="video-content">
       <view class="content">
-        <view id="dplayer" ></view>
+        <view id="dplayer"></view>
       </view>
     </view>
 
@@ -68,6 +68,8 @@ export default {
         },
       },
     });
+    console.log(this.dp)
+
   },
   onLoad(option) {
   },
