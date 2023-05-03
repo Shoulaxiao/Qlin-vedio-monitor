@@ -29,9 +29,9 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
 
     @Value("${stmp.server.address}")
     private String stmpRecordAddress;
-//
-//    @Resource(name = "recordRtmpHandleAndPushRemote")
-//    private RecordRtmpHandleAndPushRemote recordRtmpHandleAndPushRemote;
+
+    @Resource(name = "recordRtmpHandleAndPushRemote")
+    private RecordRtmpHandleAndPushRemote recordRtmpHandleAndPushRemote;
 
     /**
      * 本地MP4文件的完整路径
@@ -45,6 +45,6 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
                 .pushUrl(stmpRecordAddress)
                 .sourceUrl(MP4_FILE_PATH)
                 .build();
-//        executorService.submit(() -> recordRtmpHandleAndPushRemote.action(config));
+        executorService.submit(() -> recordRtmpHandleAndPushRemote.action(config));
     }
 }

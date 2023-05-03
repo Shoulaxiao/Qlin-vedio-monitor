@@ -7,7 +7,7 @@ import org.bytedeco.javacv.FrameRecorder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-//@Component(value = "recordRtmpHandleAndPushRemote")
+@Component(value = "recordRtmpHandleAndPushRemote")
 public class RecordRtmpHandleAndPushRemote extends AbstractVideoApplication {
 
     protected FrameRecorder recorder;
