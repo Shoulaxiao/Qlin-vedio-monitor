@@ -1,6 +1,7 @@
 package com.qinglin.qlinvediomonitor;
 
-import com.qinglin.qlinvediomonitor.stream.LocalVideoStreamer;
+import com.qinglin.qlinvediomonitor.stream.ActionConfig;
+import com.qinglin.qlinvediomonitor.stream.RecordRtmpHandleAndPushRemote;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.FFmpegLogCallback;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ import javax.annotation.Resource;
 public class VideoPushTest extends QlinVedioMonitorApplicationTests {
 
     @Resource
-    private LocalVideoStreamer localVideoStreamer;
+    private RecordRtmpHandleAndPushRemote recordRtmpHandleAndPushRemote;
 
     @Value("${stmp.server.address}")
     private String stmpRecordAddress;
@@ -28,20 +29,10 @@ public class VideoPushTest extends QlinVedioMonitorApplicationTests {
 
     @Test
     public void pushVideo() {
-        localVideoStreamer.pushStream(MP4_FILE_PATH, stmpRecordAddress);
+        ActionConfig config = ActionConfig.builder()
+                .pushUrl(stmpRecordAddress)
+                .sourceUrl(MP4_FILE_PATH)
+                .build();
+        recordRtmpHandleAndPushRemote.action(config);
     }
-
-    @Test
-    public void test() {
-        try {
-            Class<?> aClass = FFmpegLogCallback.class.getClassLoader().loadClass("org.bytedeco.javacv.FFmpegLogCallback");
-            FFmpegLogCallback fFmpegLogCallback1 = (FFmpegLogCallback) aClass.newInstance();
-            System.out.println(fFmpegLogCallback1);
-        } catch (ClassNotFoundException e) {
-            log.info("error", e);
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

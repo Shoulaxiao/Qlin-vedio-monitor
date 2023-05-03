@@ -1,6 +1,8 @@
 package com.qinglin.qlinvediomonitor.lisentener;
 
-import com.qinglin.qlinvediomonitor.stream.VideoStream;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.qinglin.qlinvediomonitor.stream.ActionConfig;
+import com.qinglin.qlinvediomonitor.stream.RecordRtmpHandleAndPushRemote;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
@@ -8,22 +10,28 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Component
 @Slf4j
 public class ContextRefreshedListener implements ApplicationListener<ContextRefreshedEvent> {
 
-    ExecutorService executorService = new ThreadPoolExecutor(1, 2, 10L, TimeUnit.MINUTES, new LinkedBlockingDeque<>(8));
+    private ThreadFactory namedFactory = new ThreadFactoryBuilder().setNameFormat("thread-videoHandle-%d").build();
+
+
+    ExecutorService executorService = new ThreadPoolExecutor(
+            2,
+            4,
+            10L,
+            TimeUnit.MINUTES,
+            new LinkedBlockingDeque<>(8)
+            , namedFactory);
 
     @Value("${stmp.server.address}")
     private String stmpRecordAddress;
 
-    @Resource(name = "localVideoStreamer")
-    private VideoStream localVideoStreamer;
+    @Resource(name = "recordRtmpHandleAndPushRemote")
+    private RecordRtmpHandleAndPushRemote recordRtmpHandleAndPushRemote;
 
     /**
      * 本地MP4文件的完整路径
@@ -33,6 +41,10 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         log.info("开始直播推流");
-        executorService.submit(() -> localVideoStreamer.pushStream(MP4_FILE_PATH, stmpRecordAddress));
+        ActionConfig config = ActionConfig.builder()
+                .pushUrl(stmpRecordAddress)
+                .sourceUrl(MP4_FILE_PATH)
+                .build();
+        executorService.submit(() -> recordRtmpHandleAndPushRemote.action(config));
     }
 }

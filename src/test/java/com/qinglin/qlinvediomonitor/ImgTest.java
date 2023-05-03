@@ -1,7 +1,6 @@
 package com.qinglin.qlinvediomonitor;
 
 
-import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;

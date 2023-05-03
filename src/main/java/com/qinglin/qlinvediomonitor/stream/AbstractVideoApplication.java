@@ -1,17 +1,24 @@
-package com.qinglin.qlinvediomonitor;
+package com.qinglin.qlinvediomonitor.stream;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.bytedeco.javacpp.avutil;
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_imgproc;
+import org.bytedeco.ffmpeg.global.avutil;
 import org.bytedeco.javacv.*;
+import org.bytedeco.opencv.global.opencv_imgproc;
+import org.bytedeco.opencv.opencv_core.IplImage;
+import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.Scalar;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static org.bytedeco.opencv.global.opencv_core.cvFlip;
+
 @Slf4j
-public abstract class AbstractCameraApplication {
+public abstract class AbstractVideoApplication {
+
+    protected ActionConfig config;
 
     /**
      * 摄像头序号，如果只有一个摄像头，那就是0
@@ -33,13 +40,15 @@ public abstract class AbstractCameraApplication {
      * 摄像头视频的宽
      */
     @Getter
-    private final int cameraImageWidth = 1280;
+    @Setter
+    private int cameraImageWidth = 1280;
 
     /**
      * 摄像头视频的高
      */
     @Getter
-    private final int cameraImageHeight = 720;
+    @Setter
+    private int cameraImageHeight = 720;
 
     /**
      * 转换器
@@ -63,76 +72,96 @@ public abstract class AbstractCameraApplication {
 
     /**
      * 两帧之间的间隔时间
+     *
      * @return
      */
     protected int getInterval() {
         // 假设一秒钟15帧，那么两帧间隔就是(1000/15)毫秒
-        return (int)(1000/ frameRate);
+        return (int) (1000 / frameRate);
     }
 
     /**
      * 实例化帧抓取器，默认OpenCVFrameGrabber对象，
      * 子类可按需要自行覆盖
+     *
      * @throws FFmpegFrameGrabber.Exception
      */
     protected void instanceGrabber() throws FrameGrabber.Exception {
-        grabber = new OpenCVFrameGrabber(CAMERA_INDEX);
+        if (config.getCameraIndex() >= 0) {
+            grabber = new OpenCVFrameGrabber(CAMERA_INDEX);
+        } else {
+            grabber = new OpenCVFrameGrabber(config.getSourceUrl());
+        }
     }
 
     /**
      * 用帧抓取器抓取一帧，默认调用grab()方法，
      * 子类可以按需求自行覆盖
+     *
      * @return
      */
     protected Frame grabFrame() throws FrameGrabber.Exception {
         return grabber.grab();
     }
+
+    /**
+     * 初始化帧抓取器
+     *
+     * @throws Exception
+     */
     protected void initGrabber() throws Exception {
         // 实例化帧抓取器
         instanceGrabber();
-
+        this.cameraImageHeight = grabber.getImageHeight();
+        this.cameraImageWidth = getCameraImageWidth();
         // 摄像头有可能有多个分辨率，这里指定
         // 可以指定宽高，也可以不指定反而调用grabber.getImageWidth去获取，
-        grabber.setImageWidth(cameraImageWidth);
-        grabber.setImageHeight(cameraImageHeight);
-
+//        grabber.setImageWidth(cameraImageWidth);
+//        grabber.setImageHeight(cameraImageHeight);
         // 开启抓取器
         grabber.start();
     }
 
     /**
      * 预览和输出
-     * @param grabSeconds 持续时长
+     *
      * @throws Exception
      */
-    private void grabAndOutput(int grabSeconds) throws Exception {
+    private void grabAndOutput() throws Exception {
+        int grabSeconds = config.getGrabSeconds();
         // 添加水印时用到的时间工具
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        long endTime = System.currentTimeMillis() + 1000L *grabSeconds;
+        long endTime = System.currentTimeMillis() + 1000L * grabSeconds;
 
         // 两帧输出之间的间隔时间，默认是1000除以帧率，子类可酌情修改
         int interVal = getInterval();
 
         // 水印在图片上的位置
-//        org.bytedeco.javacpp.Point Pointpoint = new org.bytedeco.opencv.opencv_core.Point(15, 35);
-        opencv_core.Point point = new opencv_core.Point(15, 35);
+        org.bytedeco.opencv.opencv_core.Point point = new org.bytedeco.opencv.opencv_core.Point(15, 35);
 
         Frame captureFrame;
-        opencv_core.Mat mat;
+        IplImage img;
+        Mat mat;
 
         // 超过指定时间就结束循环
-        while (System.currentTimeMillis()<endTime) {
+        while (System.currentTimeMillis() < endTime) {
             // 取一帧
             captureFrame = grabFrame();
 
-            if (null==captureFrame) {
+            if (null == captureFrame) {
                 log.error("帧对象为空");
                 break;
             }
 
-            // 将帧对象转为mat对象
-            mat = openCVConverter.convertToMat(captureFrame);
+            // 将帧对象转为IplImage对象
+            img = openCVConverter.convert(captureFrame);
+
+            // 镜像翻转
+            cvFlip(img, img, 1);
+
+            // IplImage转mat
+            mat = new Mat(img);
 
             // 在图片上添加水印，水印内容是当前时间，位置是左上角
             opencv_imgproc.putText(mat,
@@ -140,7 +169,7 @@ public abstract class AbstractCameraApplication {
                     point,
                     opencv_imgproc.CV_FONT_VECTOR0,
                     0.8,
-                    new opencv_core.Scalar(0, 200, 255, 0),
+                    new Scalar(0, 200, 255, 0),
                     1,
                     0,
                     false);
@@ -149,7 +178,7 @@ public abstract class AbstractCameraApplication {
             output(openCVConverter.convert(mat));
 
             // 适当间隔，让肉感感受不到闪屏即可
-            if(interVal>0) {
+            if (interVal > 0) {
                 Thread.sleep(interVal);
             }
         }
@@ -168,7 +197,7 @@ public abstract class AbstractCameraApplication {
             log.error("do releaseOutputResource error", exception);
         }
 
-        if (null!=grabber) {
+        if (null != grabber) {
             try {
                 grabber.close();
             } catch (Exception exception) {
@@ -179,6 +208,7 @@ public abstract class AbstractCameraApplication {
 
     /**
      * 整合了所有初始化操作
+     *
      * @throws Exception
      */
     private void init() throws Exception {
@@ -190,13 +220,11 @@ public abstract class AbstractCameraApplication {
 
         // 实例化、初始化帧抓取器
         initGrabber();
-
         // 实例化、初始化输出操作相关的资源，
         // 具体怎么输出由子类决定，例如窗口预览、存视频文件等
         initOutput();
-
         log.info("初始化完成，耗时[{}]毫秒，帧率[{}]，图像宽度[{}]，图像高度[{}]",
-                System.currentTimeMillis()-startTime,
+                System.currentTimeMillis() - startTime,
                 frameRate,
                 cameraImageWidth,
                 cameraImageHeight);
@@ -205,12 +233,13 @@ public abstract class AbstractCameraApplication {
     /**
      * 执行抓取和输出的操作
      */
-    public void action(int grabSeconds) {
+    public void action(ActionConfig config) {
         try {
+            this.config = config;
             // 初始化操作
             init();
             // 持续拉取和推送
-            grabAndOutput(grabSeconds);
+            grabAndOutput();
         } catch (Exception exception) {
             log.error("execute action error", exception);
         } finally {
@@ -218,5 +247,4 @@ public abstract class AbstractCameraApplication {
             safeRelease();
         }
     }
-
 }
