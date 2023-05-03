@@ -1,7 +1,10 @@
 package com.qinglin.qlinvediomonitor.stream;
 
+import com.qinglin.qlinvediomonitor.model.FrameResult;
 import lombok.extern.slf4j.Slf4j;
-import org.bytedeco.ffmpeg.global.avcodec;
+import org.bytedeco.javacpp.avcodec;
+import org.bytedeco.javacpp.avformat;
+import org.bytedeco.javacv.FFmpegFrameRecorder;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameRecorder;
 import org.springframework.stereotype.Component;
@@ -17,7 +20,8 @@ public class RecordRtmpHandleAndPushRemote extends AbstractVideoApplication {
     @Override
     protected void initOutput() throws Exception {
         // 实例化FFmpegFrameRecorder，将SRS的推送地址传入
-        recorder = FrameRecorder.createDefault(config.getPushUrl(), getCameraImageWidth(), getCameraImageHeight());
+//        recorder = FrameRecorder.createDefault(config.getPushUrl(), getCameraImageWidth(), getCameraImageHeight());
+        recorder = new FFmpegFrameRecorder(config.getPushUrl(),getCameraImageWidth(),getCameraImageHeight(),grabber.getAudioChannels());
 
         recorder.setVideoOption("tune", "zerolatency");
         // ultrafast对CPU消耗最低
@@ -40,6 +44,7 @@ public class RecordRtmpHandleAndPushRemote extends AbstractVideoApplication {
 
         // 帧录制器开始初始化
         recorder.start();
+        initDetectHandler();
     }
 
     @Override
@@ -47,15 +52,18 @@ public class RecordRtmpHandleAndPushRemote extends AbstractVideoApplication {
         if (0L == startRecordTime) {
             startRecordTime = System.currentTimeMillis();
         }
+        FrameResult detectedFrame = videoDetectHandler.detect(frame);
+
         // 时间戳
         recorder.setTimestamp(1000 * (System.currentTimeMillis() - startRecordTime));
         //推流
-        recorder.record(frame);
+        recorder.record(detectedFrame.getFrame());
     }
 
     @Override
     protected void releaseOutputResource() throws Exception {
         recorder.close();
+        videoDetectHandler.release();
     }
 
     @Override

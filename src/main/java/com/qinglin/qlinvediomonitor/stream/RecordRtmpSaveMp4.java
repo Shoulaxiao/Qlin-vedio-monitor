@@ -4,20 +4,18 @@ import com.qinglin.qlinvediomonitor.enums.VideoTypeEnum;
 import com.qinglin.qlinvediomonitor.model.FrameResult;
 import com.qinglin.qlinvediomonitor.mp.entity.VideoDetail;
 import com.qinglin.qlinvediomonitor.mp.mapper.VideoDetailMapper;
-import com.qinglin.qlinvediomonitor.stream.detect.DetectService;
 import com.qinglin.qlinvediomonitor.stream.detect.impl.HaarCascadeDetectService;
 import com.qinglin.qlinvediomonitor.utils.SystemUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.bytedeco.ffmpeg.global.avcodec;
+import org.bytedeco.javacpp.avcodec;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameRecorder;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import static org.bytedeco.ffmpeg.global.avutil.AV_PIX_FMT_YUV420P;
+import static org.bytedeco.javacpp.avutil.AV_PIX_FMT_YUV420P;
+
 
 /**
  * @author will
@@ -38,7 +36,6 @@ public class RecordRtmpSaveMp4 extends AbstractVideoApplication {
      */
     private static final String RECORD_FILE_PATH = SystemUtils.prefixPath();
 
-    private VideoDetectHandler videoDetectHandler;
     /**
      * 帧录制器
      */
@@ -100,12 +97,5 @@ public class RecordRtmpSaveMp4 extends AbstractVideoApplication {
         videoDetailMapper.insert(detail);
     }
 
-    private void initDetectHandler() throws Exception {
-        // 检测服务的初始化操作
-        videoDetectHandler = new VideoDetectHandler();
-        HaarCascadeDetectService faceDetect = new HaarCascadeDetectService("haarcascade_frontalface_alt.xml");
-        HaarCascadeDetectService bodyDetect = new HaarCascadeDetectService("haarcascade_upperbody.xml");
-        videoDetectHandler.addHandler(faceDetect)
-                .addHandler(bodyDetect);
-    }
+
 }

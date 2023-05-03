@@ -2,6 +2,7 @@ package com.qinglin.qlinvediomonitor.stream;
 
 import com.qinglin.qlinvediomonitor.model.FrameResult;
 import com.qinglin.qlinvediomonitor.stream.detect.DetectService;
+import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.Frame;
 
 /**
@@ -11,6 +12,7 @@ import org.bytedeco.javacv.Frame;
  * @Description
  * @date 2023/5/3 12:05
  */
+@Slf4j
 public class VideoDetectHandler {
 
     private HandlerNode cur;

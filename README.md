@@ -9,12 +9,15 @@ docker pull alqutami/rtmp-hls
 * 运行nginx-stmp容器。$HOME/Documents/nginx/nginx.conf 需要替换为自己电脑上的路径
 ```docker
 docker run -d --name nginx-hls -p 1935:1935 -p 8887:8887 -v $HOME/Documents/nginx/nginx.conf:/etc/nginx/nginx.conf alqutami/rtmp-hls
+docker run -d --name nginx-hls -p 1935:1935 -p 8887:8887 -v /d/docker/nginx-rtmp/nginx.conf:/etc/nginx/nginx.conf alqutami/rtmp-hls
+docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 --name mysql mysql --default-authentication-plugin=mysql_native_password
 ```
 nginx.conf 的配置文件如下：
 ```
 worker_processes  auto;
-#error_log  logs/error.log;
+#error_log  logs/error.log;2023-05-03 13:37:37.349 ERROR [][][][][]execute action error
 
+    
 events {
     worker_connections  1024;
 }

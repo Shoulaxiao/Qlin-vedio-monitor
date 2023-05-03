@@ -30,13 +30,16 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
     @Value("${stmp.server.address}")
     private String stmpRecordAddress;
 
+    @Value("${http.pull.stream.address}")
+    private String stmpPushAddress;
+
     @Resource(name = "recordRtmpHandleAndPushRemote")
     private RecordRtmpHandleAndPushRemote recordRtmpHandleAndPushRemote;
 
     /**
      * 本地MP4文件的完整路径
      */
-    private static final String MP4_FILE_PATH = "/Users/shoulaxiao/Movies/Normal.People.S01E01.WEBrip.720P.mp4";
+    private static final String MP4_FILE_PATH = "C:\\Users\\huanjiejie\\Videos\\Captures\\Let Go - Beau Young Prince 2023-02-09 00-44-09.mp4";
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -44,6 +47,7 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
         ActionConfig config = ActionConfig.builder()
                 .pushUrl(stmpRecordAddress)
                 .sourceUrl(MP4_FILE_PATH)
+                .cameraIndex(0)
                 .build();
         executorService.submit(() -> recordRtmpHandleAndPushRemote.action(config));
     }

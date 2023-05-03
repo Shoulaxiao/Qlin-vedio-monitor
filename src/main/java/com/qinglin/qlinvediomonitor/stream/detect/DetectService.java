@@ -1,13 +1,16 @@
 package com.qinglin.qlinvediomonitor.stream.detect;
 
+import com.qinglin.qlinvediomonitor.enums.VideoTypeEnum;
 import com.qinglin.qlinvediomonitor.model.FrameResult;
+import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
-import org.bytedeco.opencv.opencv_core.*;
-import org.bytedeco.opencv.opencv_objdetect.CascadeClassifier;
+import org.bytedeco.javacpp.opencv_core.*;
+import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
 
-import static org.bytedeco.opencv.global.opencv_core.CV_8UC1;
-import static org.bytedeco.opencv.global.opencv_imgproc.*;
+import static org.bytedeco.javacpp.opencv_core.CV_8UC1;
+import static org.bytedeco.javacpp.opencv_imgproc.*;
+
 
 /**
  * @author willzhao
@@ -39,42 +42,13 @@ public interface DetectService {
      * @param grayImage    存放灰度图片的mat
      * @return 标注了识别结果的视频帧
      */
-    static FrameResult detect(CascadeClassifier classifier,
-                              OpenCVFrameConverter.ToMat converter,
-                              Frame rawFrame,
-                              Mat grabbedImage,
-                              Mat grayImage) {
+      FrameResult detect(CascadeClassifier classifier,
+                               OpenCVFrameConverter.ToMat converter,
+                               Frame rawFrame,
+                               Mat grabbedImage,
+                               Mat grayImage);
 
-        // 当前图片转为灰度图片
-        cvtColor(grabbedImage, grayImage, CV_BGR2GRAY);
 
-        // 存放检测结果的容器
-        RectVector objects = new RectVector();
-
-        // 开始检测
-        classifier.detectMultiScale(grayImage, objects);
-
-        // 检测结果总数
-        long total = objects.size();
-
-        // 如果没有检测到结果，就用原始帧返回
-        if (total < 1) {
-            return new FrameResult(rawFrame, false);
-        }
-
-        // 如果有检测结果，就根据结果的数据构造矩形框，画在原图上
-        for (long i = 0; i < total; i++) {
-            Rect r = objects.get(i);
-            int x = r.x(), y = r.y(), w = r.width(), h = r.height();
-            rectangle(grabbedImage, new Point(x, y), new Point(x + w, y + h), Scalar.RED, 1, CV_AA, 0);
-        }
-
-        // 释放检测结果资源
-        objects.close();
-
-        // 将标注过的图片转为帧，返回
-        return new FrameResult(converter.convert(grabbedImage), true);
-    }
 
     /**
      * 初始化操作，例如模型下载
@@ -95,4 +69,5 @@ public interface DetectService {
      * 释放资源
      */
     void releaseOutputResource();
+
 }

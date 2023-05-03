@@ -12,10 +12,12 @@ public enum VideoTypeEnum {
      * 画面抖动
      */
     PICTURE_MOVE(0, "画面抖动"),
+    STATIC(-1, "画面静止"),
     /**
      * 人物运动
      */
-    CHARACTER_MOVE(1, "人物运动");
+    CHARACTER_MOVE(1, "人物运动"),
+    CHARACTER_FACE(2, "人脸识别");
 
     private Integer code;
     private String desc;

@@ -1,13 +1,15 @@
 package com.qinglin.qlinvediomonitor.stream.detect.impl;
 
+import com.qinglin.qlinvediomonitor.enums.VideoTypeEnum;
 import com.qinglin.qlinvediomonitor.model.FrameResult;
+import com.qinglin.qlinvediomonitor.stream.detect.AbstractVideoDetect;
 import com.qinglin.qlinvediomonitor.stream.detect.DetectService;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacpp.Loader;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
-import org.bytedeco.opencv.opencv_core.Mat;
-import org.bytedeco.opencv.opencv_objdetect.CascadeClassifier;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -23,8 +25,9 @@ import java.net.URL;
  */
 @Slf4j
 //@Service("haarCascadeDetectService")
-public class HaarCascadeDetectService implements DetectService {
+public class HaarCascadeDetectService extends AbstractVideoDetect {
 
+    private VideoTypeEnum videoType;
     /**
      * 每一帧原始图片的对象
      */
@@ -55,9 +58,21 @@ public class HaarCascadeDetectService implements DetectService {
      *
      * @param modelFileUrl
      */
+    public HaarCascadeDetectService(String modelFileUrl, VideoTypeEnum videoType) throws Exception {
+        this.modelFileUrl = modelFileUrl;
+        this.videoType = videoType;
+        this.init();
+    }
+
     public HaarCascadeDetectService(String modelFileUrl) throws Exception {
         this.modelFileUrl = modelFileUrl;
         this.init();
+    }
+
+    @Override
+    protected FrameResult output(Frame frame) {
+        log.info("检测成功，类型=[{}]",videoType.getDesc());
+        return new FrameResult(frame, true, videoType);
     }
 
     /**
@@ -86,7 +101,7 @@ public class HaarCascadeDetectService implements DetectService {
         }
 
         // 进行人脸识别，根据结果做处理得到预览窗口显示的帧
-        return DetectService.detect(classifier, converter, frame, grabbedImage, grayImage);
+        return detect(classifier, converter, frame, grabbedImage, grayImage);
     }
 
     /**

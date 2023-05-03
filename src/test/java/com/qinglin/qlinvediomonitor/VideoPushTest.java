@@ -25,7 +25,7 @@ public class VideoPushTest extends QlinVedioMonitorApplicationTests {
     @Value("${stmp.server.address}")
     private String stmpRecordAddress;
 
-    private static final String MP4_FILE_PATH = "/Users/shoulaxiao/Movies/Normal.People.S01E01.WEBrip.720P.mp4";
+    private static final String MP4_FILE_PATH = "C:\\Users\\huanjiejie\\Videos\\Captures\\Let Go - Beau Young Prince 2023-02-09 00-44-09.mp4";
 
     @Test
     public void pushVideo() {

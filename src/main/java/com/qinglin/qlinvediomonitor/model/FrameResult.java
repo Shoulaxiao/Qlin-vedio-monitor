@@ -1,5 +1,6 @@
 package com.qinglin.qlinvediomonitor.model;
 
+import com.qinglin.qlinvediomonitor.enums.VideoTypeEnum;
 import lombok.Data;
 import org.bytedeco.javacv.Frame;
 
@@ -20,8 +21,14 @@ public class FrameResult {
      */
     private boolean success;
 
-    public FrameResult(Frame frame, boolean success) {
+    /**
+     * 检测结果类型
+     */
+    private VideoTypeEnum videoType;
+
+    public FrameResult(Frame frame, boolean success,VideoTypeEnum videoType) {
         this.frame = frame;
         this.success = success;
+        this.videoType = videoType;
     }
 }
