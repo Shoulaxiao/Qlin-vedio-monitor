@@ -3,9 +3,12 @@ package com.qinglin.qlinvediomonitor.websocket;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.qinglin.qlinvediomonitor.enums.CommandTypeEnum;
+import com.qinglin.qlinvediomonitor.model.SensorEvent;
 import com.qinglin.qlinvediomonitor.model.SocketReqDTO;
 import com.qinglin.qlinvediomonitor.model.SocketResDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -23,9 +26,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2023/5/6 19:29
  */
 
+@Slf4j
 @ServerEndpoint("/wsserver/{userId}")//userId：地址的111就是这个userId"ws://localhost:8899/wsserver/111"
 @Component
-public class WebSocketServer {
+public class WebSocketServer implements ApplicationListener<SensorEvent> {
 
     /**
      * 用来记录当前在线连接数。应该把它设计成线程安全的。
@@ -157,4 +161,12 @@ public class WebSocketServer {
     }
 
 
+    @Override
+    public void onApplicationEvent(SensorEvent event) {
+        try {
+            this.sendMessage(event.getMsg());
+        } catch (IOException e) {
+            log.error("事件消费异常");
+        }
+    }
 }

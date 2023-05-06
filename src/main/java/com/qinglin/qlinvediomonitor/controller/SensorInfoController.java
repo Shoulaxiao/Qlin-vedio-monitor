@@ -3,11 +3,13 @@ package com.qinglin.qlinvediomonitor.controller;
 import com.alibaba.fastjson2.JSON;
 import com.qinglin.qlinvediomonitor.common.SingleResult;
 import com.qinglin.qlinvediomonitor.enums.CommandTypeEnum;
+import com.qinglin.qlinvediomonitor.model.SensorEvent;
 import com.qinglin.qlinvediomonitor.model.SensorReq;
 import com.qinglin.qlinvediomonitor.model.SocketResDTO;
 import com.qinglin.qlinvediomonitor.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,9 @@ import java.util.UUID;
 @Slf4j
 public class SensorInfoController {
 
+    @Resource
+    private ApplicationEventPublisher eventPublisher;
+
 
     @Resource
     private WebSocketServer webSocketServer;
@@ -43,8 +48,9 @@ public class SensorInfoController {
         socketResDTO.setResult(JSON.toJSONString(sensorReq));
         socketResDTO.setCmdEnterType(CommandTypeEnum.SENSOR_INFO.getCode());
         try {
-            webSocketServer.sendMessage(JSON.toJSONString(socketResDTO));
-        } catch (IOException e) {
+            eventPublisher.publishEvent(new SensorEvent(this, JSON.toJSONString(socketResDTO)));
+//            webSocketServer.sendMessage(JSON.toJSONString(socketResDTO));
+        } catch (Exception e) {
             log.error("发送传感器信息到客户端失败", e);
         }
         return new SingleResult<>(null, true, StringUtils.EMPTY, StringUtils.EMPTY);
