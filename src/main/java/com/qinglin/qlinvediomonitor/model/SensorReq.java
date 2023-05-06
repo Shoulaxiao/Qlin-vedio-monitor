@@ -2,6 +2,8 @@ package com.qinglin.qlinvediomonitor.model;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author by shoulaxiao
  * @version 1.0.0
@@ -10,7 +12,7 @@ import lombok.Data;
  * @date 2023/5/6 19:21
  */
 @Data
-public class SensorReq {
+public class SensorReq implements Serializable {
 
     /**
      * 湿度
