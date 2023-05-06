@@ -1,6 +1,7 @@
 package com.qinglin.qlinvediomonitor.stream;
 
 import com.qinglin.qlinvediomonitor.enums.VideoTypeEnum;
+import com.qinglin.qlinvediomonitor.model.FrameResult;
 import com.qinglin.qlinvediomonitor.stream.detect.impl.HaarCascadeDetectService;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,11 @@ public abstract class AbstractVideoApplication {
     protected ActionConfig config;
 
     /**
+     * 转换器
+     */
+    private final OpenCVFrameConverter.ToIplImage openCVConverter = new OpenCVFrameConverter.ToIplImage();
+
+    /**
      * 摄像头序号，如果只有一个摄像头，那就是0
      */
     protected static final int CAMERA_INDEX = 0;
@@ -39,6 +45,12 @@ public abstract class AbstractVideoApplication {
     @Getter
     @Setter
     private double frameRate = 30;
+    @Getter
+    @Setter
+    private int videoBitrate = 2000000;
+    @Getter
+    @Setter
+    private int audioChannel = 2;
 
     /**
      * 摄像头视频的宽
@@ -54,10 +66,6 @@ public abstract class AbstractVideoApplication {
     @Setter
     private int cameraImageHeight = 720;
 
-    /**
-     * 转换器
-     */
-    private final OpenCVFrameConverter.ToIplImage openCVConverter = new OpenCVFrameConverter.ToIplImage();
 
     /**
      * 实例化、初始化输出操作相关的资源
@@ -77,11 +85,12 @@ public abstract class AbstractVideoApplication {
     protected void initDetectHandler() throws Exception {
         // 检测服务的初始化操作
         videoDetectHandler = new VideoDetectHandler();
+        HaarCascadeDetectService bodyDetect = new HaarCascadeDetectService("haarcascade_upperbody.xml", VideoTypeEnum.CHARACTER_MOVE);
         HaarCascadeDetectService faceDetect = new HaarCascadeDetectService("haarcascade_frontalface_alt.xml", VideoTypeEnum.CHARACTER_FACE);
-        HaarCascadeDetectService bodyDetect = new HaarCascadeDetectService("haarcascade_upperbody.xml",VideoTypeEnum.CHARACTER_MOVE);
         videoDetectHandler.addHandler(faceDetect)
                 .addHandler(bodyDetect);
     }
+
     /**
      * 两帧之间的间隔时间
      *
@@ -95,14 +104,13 @@ public abstract class AbstractVideoApplication {
     /**
      * 实例化帧抓取器，默认OpenCVFrameGrabber对象，
      * 子类可按需要自行覆盖
-     *
      */
     protected void instanceGrabber() {
         if (config.getCameraIndex() >= 0) {
             log.info("开始初始化本地摄像头视频源");
             grabber = new OpenCVFrameGrabber(CAMERA_INDEX);
         } else {
-            grabber = new OpenCVFrameGrabber(config.getSourceUrl());
+            grabber = new FFmpegFrameGrabber(config.getSourceUrl());
         }
     }
 
@@ -113,7 +121,7 @@ public abstract class AbstractVideoApplication {
      * @return
      */
     protected Frame grabFrame() throws FrameGrabber.Exception {
-        return grabber.grab();
+        return grabber.grabFrame();
     }
 
     /**
@@ -129,7 +137,8 @@ public abstract class AbstractVideoApplication {
         this.cameraImageHeight = grabber.getImageHeight();
         this.cameraImageWidth = grabber.getImageWidth();
         this.frameRate = (int) grabber.getFrameRate();
-
+        this.videoBitrate = grabber.getVideoBitrate();
+        this.audioChannel = grabber.getAudioChannels();
     }
 
     /**
@@ -138,65 +147,60 @@ public abstract class AbstractVideoApplication {
      * @throws Exception
      */
     private void grabAndOutput() throws Exception {
-        int grabSeconds = config.getGrabSeconds();
         // 添加水印时用到的时间工具
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        long endTime = System.currentTimeMillis() + 1000L * grabSeconds;
-
         // 两帧输出之间的间隔时间，默认是1000除以帧率，子类可酌情修改
         int interVal = getInterval();
-
         // 水印在图片上的位置
         Point point = new Point(15, 35);
 
         Frame captureFrame;
         IplImage img;
         Mat mat;
-
         // 超过指定时间就结束循环
         long startTime = System.currentTimeMillis();
         try {
-            while (grabber.grab() != null || System.currentTimeMillis() < endTime) {
-                // 取一帧
-                captureFrame = grabFrame();
-
-                if (null == captureFrame) {
-                    log.error("帧对象为空");
-                    break;
+            while ((captureFrame = grabFrame()) != null) {
+                //添加水印
+                if (captureFrame.image != null) {
+                    // 将帧对象转为IplImage对象
+                    img = frame2Img(captureFrame);
+                    // IplImage转mat
+                    mat = new Mat(img);
+                    // 在图片上添加水印，水印内容是当前时间，位置是左上角
+                    opencv_imgproc.putText(mat,
+                            simpleDateFormat.format(new Date()),
+                            point,
+                            opencv_imgproc.CV_FONT_VECTOR0,
+                            0.8,
+                            new Scalar(255, 255, 255, 0),
+                            2,
+                            0,
+                            false);
+                    FrameResult frameResult = frameDetect(mat2Frame(mat));
+                    captureFrame = frameResult.getFrame();
                 }
-                log.info("帧对象的信息，宽度[{}],高度[{}]",captureFrame.imageWidth,captureFrame.imageHeight);
-                // 将帧对象转为IplImage对象
-                img = openCVConverter.convert(captureFrame);
-                // IplImage转mat
-                mat = new Mat(img);
-
-                // 在图片上添加水印，水印内容是当前时间，位置是左上角
-                opencv_imgproc.putText(mat,
-                        simpleDateFormat.format(new Date()),
-                        point,
-                        opencv_imgproc.CV_FONT_VECTOR0,
-                        0.8,
-                        new Scalar(255, 255, 255, 0),
-                        2,
-                        0,
-                        false);
-                output(openCVConverter.convert(mat));
+                output(captureFrame);
                 // 适当间隔，让肉感感受不到闪屏即可
                 if (interVal > 0) {
                     Thread.sleep(interVal);
                 }
             }
-
-        }catch (Exception e){
-            log.error("推送异常",e);
+        } catch (Exception e) {
+            log.error("推送异常", e);
             throw e;
-        }finally {
+        } finally {
             log.info("推送完成，耗时[{}]秒",
                     (System.currentTimeMillis() - startTime) / 1000);
         }
 
     }
+
+    protected abstract FrameResult frameDetect(Frame mat2Frame);
+
+    protected abstract IplImage frame2Img(Frame frame);
+
+    protected abstract Frame mat2Frame(Mat mat);
 
     /**
      * 释放所有资源

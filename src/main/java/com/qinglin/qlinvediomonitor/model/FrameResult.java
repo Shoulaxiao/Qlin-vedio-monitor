@@ -26,7 +26,10 @@ public class FrameResult {
      */
     private VideoTypeEnum videoType;
 
-    public FrameResult(Frame frame, boolean success,VideoTypeEnum videoType) {
+    public FrameResult() {
+    }
+
+    public FrameResult(Frame frame, boolean success, VideoTypeEnum videoType) {
         this.frame = frame;
         this.success = success;
         this.videoType = videoType;

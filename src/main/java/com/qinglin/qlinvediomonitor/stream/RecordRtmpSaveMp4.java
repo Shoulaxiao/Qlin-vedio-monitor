@@ -4,13 +4,14 @@ import com.qinglin.qlinvediomonitor.enums.VideoTypeEnum;
 import com.qinglin.qlinvediomonitor.model.FrameResult;
 import com.qinglin.qlinvediomonitor.mp.entity.VideoDetail;
 import com.qinglin.qlinvediomonitor.mp.mapper.VideoDetailMapper;
-import com.qinglin.qlinvediomonitor.stream.detect.impl.HaarCascadeDetectService;
 import com.qinglin.qlinvediomonitor.utils.SystemUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacpp.avcodec;
+import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameRecorder;
+import org.bytedeco.javacv.OpenCVFrameConverter;
 
 import javax.annotation.Resource;
 
@@ -25,6 +26,7 @@ import static org.bytedeco.javacpp.avutil.AV_PIX_FMT_YUV420P;
  */
 @Slf4j
 public class RecordRtmpSaveMp4 extends AbstractVideoApplication {
+    private final OpenCVFrameConverter.ToIplImage openCVConverter = new OpenCVFrameConverter.ToIplImage();
 
     @Resource
     private VideoDetailMapper videoDetailMapper;
@@ -65,12 +67,13 @@ public class RecordRtmpSaveMp4 extends AbstractVideoApplication {
 
     @Override
     protected void output(Frame frame) throws Exception {
-        FrameResult detectedFrame = videoDetectHandler.detect(frame);
         // 存盘
-        recorder.record(detectedFrame.getFrame());
+        recorder.record(frame);
         // 信息保存到数据库
         saveVideoInfoToDb();
     }
+
+
 
 
     @Override
@@ -83,6 +86,22 @@ public class RecordRtmpSaveMp4 extends AbstractVideoApplication {
     @Override
     protected int getInterval() {
         return super.getInterval() / 8;
+    }
+
+    @Override
+    protected FrameResult frameDetect(Frame mat2Frame) {
+
+        return null;
+    }
+
+    @Override
+    protected opencv_core.IplImage frame2Img(Frame frame) {
+        return openCVConverter.convert(frame);
+    }
+
+    @Override
+    protected Frame mat2Frame(opencv_core.Mat mat) {
+        return openCVConverter.convert(mat);
     }
 
 
