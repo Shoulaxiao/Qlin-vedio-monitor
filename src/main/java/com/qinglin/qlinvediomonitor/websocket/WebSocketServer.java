@@ -1,23 +1,17 @@
 package com.qinglin.qlinvediomonitor.websocket;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.qinglin.qlinvediomonitor.enums.CommandTypeEnum;
-import com.qinglin.qlinvediomonitor.model.SensorEvent;
 import com.qinglin.qlinvediomonitor.model.SocketReqDTO;
 import com.qinglin.qlinvediomonitor.model.SocketResDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -70,11 +64,11 @@ public class WebSocketServer {
             //在线数加1
         }
 
-        System.out.println("用户连接:" + userId + ",当前在线人数为:" + getOnlineCount());
+        log.info("用户连接:" + userId + ",当前在线人数为:" + getOnlineCount());
         try {
             sendMessage("连接成功");
         } catch (IOException e) {
-            System.out.println("用户:" + userId + ",网络异常!!!!!!");
+            log.info("用户:" + userId + ",网络异常!!!!!!");
         }
     }
 
@@ -106,6 +100,8 @@ public class WebSocketServer {
 
                 if (socketReqDTO != null && socketReqDTO.getCmdEnterType().equals(CommandTypeEnum.HEART_BEAT.getCode())) {
                     sendMessage("^s^h&b^" + System.currentTimeMillis(), CommandTypeEnum.HEART_BEAT, socketReqDTO.getUniKey());
+                }else if (socketReqDTO != null && socketReqDTO.getCmdEnterType().equals(CommandTypeEnum.SENSOR_INFO.getCode())){
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
