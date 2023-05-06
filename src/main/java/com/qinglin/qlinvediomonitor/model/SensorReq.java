@@ -14,6 +14,7 @@ import java.io.Serializable;
 @Data
 public class SensorReq implements Serializable {
 
+    private static final long serialVersionUID = -9059740337596296878L;
     /**
      * 湿度
      */
