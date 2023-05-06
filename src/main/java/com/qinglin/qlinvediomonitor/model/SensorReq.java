@@ -15,10 +15,10 @@ public class SensorReq {
     /**
      * 湿度
      */
-    private double humidity;
+    private String humidity;
 
     /**
      * 温度
      */
-    private double temperature;
+    private String temperature;
 }
