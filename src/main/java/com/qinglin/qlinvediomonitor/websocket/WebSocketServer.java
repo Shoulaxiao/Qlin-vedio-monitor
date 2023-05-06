@@ -7,6 +7,7 @@ import com.qinglin.qlinvediomonitor.model.SensorEvent;
 import com.qinglin.qlinvediomonitor.model.SocketReqDTO;
 import com.qinglin.qlinvediomonitor.model.SocketResDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,8 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -135,6 +138,15 @@ public class WebSocketServer implements ApplicationListener<SensorEvent> {
         this.session.getBasicRemote().sendText(message);
     }
 
+
+    public void sendMessageAll(String message) throws IOException {
+        List<String> keys = new ArrayList<>(webSocketMap.keySet());
+        if (CollectionUtils.isNotEmpty(keys)) {
+            for (String key : keys) {
+                webSocketMap.get(key).sendMessage(message);
+            }
+        }
+    }
 
     /**
      * 发送自定义消息

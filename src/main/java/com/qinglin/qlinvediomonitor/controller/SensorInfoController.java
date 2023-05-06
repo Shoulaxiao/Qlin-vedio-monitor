@@ -48,8 +48,7 @@ public class SensorInfoController {
         socketResDTO.setResult(JSON.toJSONString(sensorReq));
         socketResDTO.setCmdEnterType(CommandTypeEnum.SENSOR_INFO.getCode());
         try {
-            eventPublisher.publishEvent(new SensorEvent(this, JSON.toJSONString(socketResDTO)));
-//            webSocketServer.sendMessage(JSON.toJSONString(socketResDTO));
+            webSocketServer.sendMessageAll(JSON.toJSONString(socketResDTO));
         } catch (Exception e) {
             log.error("发送传感器信息到客户端失败", e);
         }
