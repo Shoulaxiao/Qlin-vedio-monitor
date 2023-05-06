@@ -62,6 +62,11 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
 
+        <!-- webSocket-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
@@ -135,33 +140,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
         </dependency>
-
-        <!--        <dependency>-->
-        <!--            <groupId>org.bytedeco</groupId>-->
-        <!--            <artifactId>javacv</artifactId>-->
-        <!--            <version>1.4.3</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.bytedeco.javacpp-presets</groupId>-->
-        <!--            <artifactId>ffmpeg-platform</artifactId>-->
-        <!--            <version>4.0.2-1.4.3</version>-->
-        <!--        </dependency>-->
-        <!--        &lt;!&ndash;项目在本地window用FFmpeg-windows-x86_64，项目在Linux用FFmpeg-linux-x86_64&ndash;&gt;-->
-        <!--        <dependency>-->
-        <!--            <groupId>com.github.hoary.ffmpeg</groupId>-->
-        <!--            <artifactId>FFmpeg-windows-x86_64</artifactId>-->
-        <!--            <version>2.0.1.1</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>com.github.hoary.ffmpeg</groupId>-->
-        <!--            <artifactId>FFmpeg-macosx-x86_64</artifactId>-->
-        <!--            <version>2.0.1.1</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>com.github.hoary.ffmpeg</groupId>-->
-        <!--            <artifactId>FFmpeg-linux-x86_64</artifactId>-->
-        <!--            <version>2.0.1.1</version>-->
-        <!--        </dependency>-->
 
 
         <dependency>

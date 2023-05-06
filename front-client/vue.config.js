@@ -37,7 +37,12 @@ module.exports = {
                 pathRewrite: {
                     "^/api": "/api"
                 }
-            }
+            },
+            '/wsserver': {
+                target: 'ws://localhost:8899/rms',
+                ws: true,
+                changeOrigin: true,
+            },
         }
     },
 }

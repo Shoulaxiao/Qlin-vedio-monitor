@@ -149,3 +149,8 @@ http {
 }
 
 ```
+
+## 采集摄像头数据命令
+```shell
+ffmpeg -i /dev/video0 -vcodec libx264 -max_delay 100 -s 640x480 -f flv -an  -g 5 -b 700000 rtmp://192.168.0.105:1935/show/camera
+```

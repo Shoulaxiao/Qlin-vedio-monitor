@@ -16,21 +16,9 @@ import javax.annotation.Resource;
 @Configuration
 public class MyWebConfiguration implements WebMvcConfigurer {
 
-    private  final String IMAGE_URL = "";
 
     @Resource
     private LoginInterceptor loginInterceptor;
-//
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(loginInterceptor)
-//                .addPathPatterns("/**")
-//                .excludePathPatterns("/api/oauth/apply",
-//                        "/oauth/callback",
-//                        "/api/oauth/logout",
-//                        "/monitor.jsp",
-//                        "/api/wx/**");
-//    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -38,6 +26,9 @@ public class MyWebConfiguration implements WebMvcConfigurer {
                 .allowCredentials(false)
                 .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE");
     }
+
+
+
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

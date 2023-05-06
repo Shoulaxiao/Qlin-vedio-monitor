@@ -1,6 +1,8 @@
 package com.qinglin.qlinvediomonitor.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 /**
  * @author by shoulaxiao
@@ -12,5 +14,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MyConfiguration
 {
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter() {
+        return new ServerEndpointExporter();
+    }
+
 
 }
