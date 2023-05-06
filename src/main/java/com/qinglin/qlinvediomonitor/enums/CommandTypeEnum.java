@@ -13,6 +13,7 @@ public enum CommandTypeEnum {
     /**
      * SENSOR_INFO
      */
+    HEART_BEAT("HEART_BEAT", "心跳"),
     SENSOR_INFO("SENSOR_INFO", "传感器信息");
 
     private String code;

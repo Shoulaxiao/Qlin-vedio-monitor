@@ -2,6 +2,7 @@ package com.qinglin.qlinvediomonitor.model;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -12,8 +13,9 @@ import java.util.Map;
  * @date 2023/5/6 19:46
  */
 @Data
-public class SocketResDTO {
+public class SocketResDTO implements Serializable {
 
+    private static final long serialVersionUID = 6431494416538728224L;
     /**
      * 唯一key
      */

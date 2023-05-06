@@ -2,6 +2,9 @@ package com.qinglin.qlinvediomonitor.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.qinglin.qlinvediomonitor.enums.CommandTypeEnum;
+import com.qinglin.qlinvediomonitor.model.SocketReqDTO;
+import com.qinglin.qlinvediomonitor.model.SocketResDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +12,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -72,52 +76,54 @@ public class WebSocketServer {
      */
     @OnClose
     public void onClose() {
-        if(webSocketMap.containsKey(userId)){
+        if (webSocketMap.containsKey(userId)) {
             webSocketMap.remove(userId);
             //从set中删除
             subOnlineCount();
         }
-        System.out.println("用户退出:"+userId+",当前在线人数为:" + getOnlineCount());
+        System.out.println("用户退出:" + userId + ",当前在线人数为:" + getOnlineCount());
     }
 
     /**
      * 收到客户端消息后调用的方法
      *
-     * @param message 客户端发送过来的消息*/
+     * @param message 客户端发送过来的消息
+     */
     @OnMessage
     public void onMessage(String message, Session session) {
-        System.out.println("用户消息:"+userId+",报文:"+message);
-        //可以群发消息
-        //消息保存到数据库、redis
-        if(StringUtils.isNotBlank(message)){
+        System.out.println("用户消息:" + userId + ",报文:" + message);
+        if (StringUtils.isNotBlank(message)) {
             try {
                 //解析发送的报文
-                JSONObject jsonObject = JSON.parseObject(message);
-                //追加发送人(防止串改)
-                jsonObject.put("fromUserId",this.userId);
-                String toUserId=jsonObject.getString("toUserId");
-                //传送给对应toUserId用户的websocket
-                if(StringUtils.isNotBlank(toUserId)&&webSocketMap.containsKey(toUserId)){
-                    webSocketMap.get(toUserId).sendMessage(jsonObject.toJSONString());
-                }else{
-                    System.out.println("请求的userId:"+toUserId+"不在该服务器上");
-                    //否则不在这个服务器上，发送到mysql或者redis
+                SocketReqDTO socketReqDTO = JSON.parseObject(message, SocketReqDTO.class);
+
+                if (socketReqDTO != null && socketReqDTO.getCmdEnterType().equals(CommandTypeEnum.HEART_BEAT.getCode())) {
+                    sendMessage("^s^h&b^" + System.currentTimeMillis(), CommandTypeEnum.HEART_BEAT, socketReqDTO.getUniKey());
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+
     /**
-     *
      * @param session
      * @param error
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        System.out.println("用户错误:"+this.userId+",原因:"+error.getMessage());
+        System.out.println("用户错误:" + this.userId + ",原因:" + error.getMessage());
         error.printStackTrace();
     }
+
+    public void sendMessage(String message, CommandTypeEnum etermType, String uniKey) throws IOException {
+        SocketResDTO socketResDTO = new SocketResDTO();
+        socketResDTO.setUniKey(UUID.randomUUID().toString());
+        socketResDTO.setResult(message);
+        socketResDTO.setCmdEnterType(etermType.getCode());
+        this.sendMessage(JSON.toJSONString(socketResDTO));
+    }
+
     /**
      * 实现服务器主动推送
      */
@@ -128,13 +134,13 @@ public class WebSocketServer {
 
     /**
      * 发送自定义消息
-     * */
-    public static void sendInfo(String message,@PathParam("userId") String userId) throws IOException {
-        System.out.println("发送消息到:"+userId+"，报文:"+message);
-        if(StringUtils.isNotBlank(userId)&&webSocketMap.containsKey(userId)){
+     */
+    public static void sendInfo(String message, @PathParam("userId") String userId) throws IOException {
+        System.out.println("发送消息到:" + userId + "，报文:" + message);
+        if (StringUtils.isNotBlank(userId) && webSocketMap.containsKey(userId)) {
             webSocketMap.get(userId).sendMessage(message);
-        }else{
-            System.out.println("用户"+userId+",不在线！");
+        } else {
+            System.out.println("用户" + userId + ",不在线！");
         }
     }
 

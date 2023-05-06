@@ -79,6 +79,7 @@
     "mui-player-desktop-plugin": "^1.6.0",
     "path": "^0.12.7",
     "ramda": "^0.29.0",
+    "reconnecting-websocket": "^4.4.0",
     "vue": "^2.6.11",
     "vue-cli-configjs": "https://registry.npmmirror.com/vue-cli-configjs/-/vue-cli-configjs-2.0.0.tgz",
     "vuex": "3.6.2"
