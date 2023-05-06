@@ -40,7 +40,7 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
     /**
      * 本地MP4文件的完整路径
      */
-    private static final String MP4_FILE_PATH = "G:\\pr\\manji8anghong.mkv";
+    private static final String MP4_FILE_PATH = "C:\\Users\\huanjiejie\\Desktop\\84cca6c26b72df89d595de3ad2ef0ea2.mp4";
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {

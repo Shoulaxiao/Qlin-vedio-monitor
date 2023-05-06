@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @ServerEndpoint("/wsserver/{userId}")//userId：地址的111就是这个userId"ws://localhost:8899/wsserver/111"
 @Component
-public class WebSocketServer implements ApplicationListener<SensorEvent> {
+public class WebSocketServer {
 
     /**
      * 用来记录当前在线连接数。应该把它设计成线程安全的。
@@ -88,7 +88,7 @@ public class WebSocketServer implements ApplicationListener<SensorEvent> {
             //从set中删除
             subOnlineCount();
         }
-        System.out.println("用户退出:" + userId + ",当前在线人数为:" + getOnlineCount());
+        log.info("用户退出:{} ,当前在线人数为:{},{}", userId,getOnlineCount(),this);
     }
 
     /**
@@ -135,16 +135,8 @@ public class WebSocketServer implements ApplicationListener<SensorEvent> {
      * 实现服务器主动推送
      */
     public void sendMessage(String message) throws IOException {
-        this.session.getBasicRemote().sendText(message);
-    }
-
-
-    public void sendMessageAll(String message) throws IOException {
-        List<String> keys = new ArrayList<>(webSocketMap.keySet());
-        if (CollectionUtils.isNotEmpty(keys)) {
-            for (String key : keys) {
-                webSocketMap.get(key).sendMessage(message);
-            }
+        if (this.session!=null){
+            this.session.getBasicRemote().sendText(message);
         }
     }
 
@@ -172,13 +164,9 @@ public class WebSocketServer implements ApplicationListener<SensorEvent> {
         WebSocketServer.onlineCount--;
     }
 
-
-    @Override
-    public void onApplicationEvent(SensorEvent event) {
-        try {
-            this.sendMessage(event.getMsg());
-        } catch (IOException e) {
-            log.error("事件消费异常");
-        }
+    public static ConcurrentHashMap<String,WebSocketServer> getWebSocketMap(){
+        return webSocketMap;
     }
+
+
 }
