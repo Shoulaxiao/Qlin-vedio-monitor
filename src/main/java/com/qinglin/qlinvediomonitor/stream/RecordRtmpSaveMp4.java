@@ -202,7 +202,7 @@ public class RecordRtmpSaveMp4 extends AbstractVideoApplication implements Recor
         // 帧率与抓取器一致
         recorder.setFrameRate(getFrameRate());
         // 编码器类型
-        recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
+        recorder.setVideoCodec(grabber.getVideoCodec());
         recorder.setGopSize((int) getFrameRate());
 
         // 视频质量，0表示无损

@@ -85,7 +85,9 @@ http {
 		
 		location /images {
 		    root /home/images;
-		    autoindex on;
+		    autoindex_exact_size off; # 显示出文件的确切大小,默认为on开启
+            autoindex_localtime on; # 显示的文件时间为文件的服务器时间，off时显示为GMT时间
+            charset utf-8,gbk; # 编码设置
 		}
 		
 		# Serve HLS fragments
@@ -154,8 +156,17 @@ http {
 }
 
 ```
-
 ## 采集摄像头数据命令
+进入桌面端docker,运行alqutami/rtmp-hls和mysql实例
+## 采集摄像头数据命令
+-- 安装好ffmpeg工具 --
+远程连接树莓派，在终端输入以下命令，注意： rtmp://192.168.0.105:1935/show/camera 的地址响应的IP需要改为nginx-hls流媒体服务器所在机器的IP
 ```shell
 ffmpeg -i /dev/video0 -vcodec libx264 -max_delay 100 -s 640x480 -f flv -an  -g 5 -b 700000 rtmp://192.168.0.105:1935/show/camera
+```
+## 运行后端程序
+## 运行前端程序
+```shell
+cd front-client
+npm run serve
 ```

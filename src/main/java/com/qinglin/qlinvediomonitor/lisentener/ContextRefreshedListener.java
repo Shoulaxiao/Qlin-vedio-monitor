@@ -53,13 +53,18 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         SystemUtils.load();
-        log.info("开始直播推流");
         ActionConfig config = ActionConfig.builder()
                 .pushUrl(stmpRecordAddress)
                 .sourceUrl(stmpPullAddress)
                 .cameraIndex(-1)
                 .build();
-        executorService.submit(() -> recordRtmpSaveMp4.action(config));
-        executorService.submit(() -> recordRtmpHandleAndPushRemote.action(config));
-    }
+        executorService.submit(() -> {
+            log.info("开始自动录制");
+            recordRtmpSaveMp4.action(config);
+        });
+            executorService.submit(() -> {
+                log.info("开始直播推流");
+                recordRtmpHandleAndPushRemote.action(config);
+            });
+        }
 }

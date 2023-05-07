@@ -3,7 +3,6 @@
     <view class="video-content">
       <view class="content">
         <view id="dplayer"></view>
-        <!--        <video-player :video-src="videoSrc" :autoPlay="true" :isLive="true"></video-player>-->
       </view>
     </view>
 
@@ -35,21 +34,20 @@ import api from '@/api/videoService'
 import Hls from 'hls.js'
 import Dplayer from 'dplayer'
 
+
 export default {
   data() {
     return {
-      title: 'Hello',
       src: '',
       videoSrc: '',
-      dp: {}
+      dp: {},
     }
   },
-  async mounted() {
-    await this.getLiveUrl()
-
+  mounted() {
     this.onInitDplayer(this.videoSrc)
   },
-  onLoad(option) {
+  async onLoad(option) {
+    this.getLiveUrl()
   },
 
   methods: {
@@ -61,30 +59,33 @@ export default {
     },
 
     onInitDplayer(url) {
-      this.dp = new Dplayer({
-        //播放器的一些参数
-        container: document.getElementById('dplayer'),
-        autoplay: true, //是否自动播放
-        lang: 'zh-cn',
-        color: '#20fc09',
-        background: '#8989d9',
-        preload: 'auto', //视频是否预加载
-        volume: 0.7, //默认音量
-        videoSrc: true,
-        live:true,
-        mutex: true, //阻止多个播放器同时播放，当前播放器播放时暂停其他播放器
-        video: {
-          url:'http://localhost:8887/hls/mp4test2.m3u8', //视频地址
-          type: 'customHls',
-          customType: {
-            customHls: function (video, player) {
-              const hls = new Hls() //实例化Hls  用于解析m3u8
-              hls.loadSource(video.src)
-              hls.attachMedia(video)
+      this.$nextTick(()=>{
+        this.dp = new Dplayer({
+          //播放器的一些参数
+          container: document.getElementById('dplayer'),
+          autoplay: true, //是否自动播放
+          lang: 'zh-cn',
+          color: '#20fc09',
+          background: '#5c5c6f',
+          preload: 'auto', //视频是否预加载
+          volume: 0.7, //默认音量
+          videoSrc: true,
+          live: true,
+          mutex: true, //阻止多个播放器同时播放，当前播放器播放时暂停其他播放器
+          video: {
+            url:'http://127.0.0.1:8887/hls/camera.m3u8', //视频地址
+            type: 'customHls',
+            customType: {
+              customHls: function (video, player) {
+                const hls = new Hls() //实例化Hls  用于解析m3u8
+                hls.loadSource(video.src)
+                hls.attachMedia(video)
+              }
             }
           },
-        },
-      });
+        });
+      })
+
       // document.querySelector(".dplayer-menu").remove(); //隐藏右键菜单
       // document.oncontextmenu = () => false; // 阻止页面所有右键事件
     },

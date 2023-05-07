@@ -5,7 +5,7 @@
         <qiun-data-charts
             type="arcbar"
             :opts="opts"
-            :chartData="chartData"/>
+            :chartData="chartDataHumidty"/>
       </view>
     </uni-section>
 
@@ -30,13 +30,13 @@ export default {
     return {
       title: 'Hello',
       heartbaet: null,
-      chartData: {},
+      chartDataHumidty: {},
       chartDataTemperature: {},
       opts: {
         color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
         padding: undefined,
         title: {
-          name: "80%",
+          name: "0%",
           fontSize: 35,
           color: "#2fc25b"
         },
@@ -61,7 +61,7 @@ export default {
         color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
         padding: undefined,
         title: {
-          name: "60℃",
+          name: "0℃",
           fontSize: 25,
           color: "#2fc25b",
           offsetY: 50
@@ -109,36 +109,7 @@ export default {
   },
   methods: {
     getServerData() {
-      //模拟从服务器获取数据时的延时
-      setTimeout(() => {
-        //模拟服务器返回数据，如果数据格式和标准格式不同，需自行按下面的格式拼接
-        let res = {
-          series: [
-            {
-              name: "湿度",
-              color: "#2fc25b",
-              data: 0.8
-            }
-          ]
-        };
-        this.chartData = JSON.parse(JSON.stringify(res));
 
-
-        //模拟服务器返回数据，如果数据格式和标准格式不同，需自行按下面的格式拼接
-        let resTemperature = {
-          categories: [{"value": 0.2, "color": "#1890ff"}, {"value": 0.8, "color": "#2fc25b"}, {
-            "value": 1,
-            "color": "#f04864"
-          }],
-          series: [
-            {
-              name: "温度",
-              data: 0.66
-            }
-          ]
-        }
-        this.chartDataTemperature = JSON.parse(JSON.stringify(resTemperature));
-      }, 500);
     },
     initSocket() {
       let that = this
@@ -176,15 +147,32 @@ export default {
               let res = {
                 series: [
                   {
-                    name: "湿度",
-                    color: "#2fc25b",
-                    data: Number(sensorInfo.humidity)
+                    name: "湿度1",
+                    color: "#20d597",
+                    data: Number(sensorInfo.humidity) / 100
                   }
                 ]
               }
-              setTimeout(() => {
-                this.chartData = JSON.parse(JSON.stringify(res));
-              }, 500);
+              this.opts.title.name=sensorInfo.humidity+'%'
+              this.chartDataHumidty = JSON.parse(JSON.stringify(res));
+
+              //模拟服务器返回数据，如果数据格式和标准格式不同，需自行按下面的格式拼接
+              let resTemperature = {
+                categories: [
+                  {"value": 0.2, "color": "#1890ff"},
+                  {"value": 0.8, "color": "#2fc25b"},
+                  {"value": 1, "color": "#f04864"}],
+                series: [
+                  {
+                    name: "温度",
+                    data: Number(sensorInfo.temperature) / 100
+                  }
+                ]
+              }
+              this.optsTemperature.title.name = sensorInfo.temperature + '℃'
+              this.chartDataTemperature = JSON.parse(JSON.stringify(resTemperature));
+              console.log("更新数据")
+
             }
           }
         }
