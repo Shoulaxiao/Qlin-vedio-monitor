@@ -32,14 +32,14 @@ module.exports = {
         port: 8002,
         proxy: {
             '/api': {
-                target: "http://192.168.0.108:8899/videoMonitor",
+                target: "http://localhost:8899/videoMonitor",
                 changeOrigin: true,
                 pathRewrite: {
                     "^/api": "/api"
                 }
             },
             '/wsserver': {
-                target: 'ws://192.168.0.108:8899/videoMonitor',
+                target: 'ws://localhost:8899/videoMonitor',
                 ws: true,
                 changeOrigin: true,
             },

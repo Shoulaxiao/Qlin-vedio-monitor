@@ -156,17 +156,23 @@ http {
 }
 
 ```
-## 采集摄像头数据命令
+## 1.采集摄像头数据命令
 进入桌面端docker,运行alqutami/rtmp-hls和mysql实例
-## 采集摄像头数据命令
+## 2.采集摄像头数据命令
 -- 安装好ffmpeg工具 --
-远程连接树莓派，在终端输入以下命令，注意： rtmp://192.168.0.105:1935/show/camera 的地址响应的IP需要改为nginx-hls流媒体服务器所在机器的IP
+远程连接树莓派，在终端输入以下命令，注意： rtmp://192.168.0.108:1935/show/camera 的地址响应的IP需要改为nginx-hls流媒体服务器所在机器的IP
 ```shell
-ffmpeg -i /dev/video0 -vcodec libx264 -max_delay 100 -s 640x480 -f flv -an  -g 5 -b 700000 rtmp://192.168.0.105:1935/show/camera
+ffmpeg -i /dev/video0 -vcodec libx264 -max_delay 100 -s 640x480 -f flv -an  -g 5 -b 700000 rtmp://192.168.0.108:1935/show/camera
 ```
-## 运行后端程序
-## 运行前端程序
+看是否推成功，看docker中，nginx-hls的file下面的/mnt
+## 3.运行后端程序
+ 定义IP=192.168.0.108:8899
+## 4.运行前端程序
+192.168.0.108:8002
 ```shell
 cd front-client
 npm run serve
 ```
+## 5.运行温湿度传感器脚本
+进入树莓派
+发请求的URL对应的IP要等于IP=192.168.0.108:8899
