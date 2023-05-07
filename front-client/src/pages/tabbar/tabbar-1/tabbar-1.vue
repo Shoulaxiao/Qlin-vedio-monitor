@@ -74,7 +74,7 @@ export default {
         live:true,
         mutex: true, //阻止多个播放器同时播放，当前播放器播放时暂停其他播放器
         video: {
-          url, //视频地址
+          url:'http://localhost:8887/hls/mp4test2.m3u8', //视频地址
           type: 'customHls',
           customType: {
             customHls: function (video, player) {

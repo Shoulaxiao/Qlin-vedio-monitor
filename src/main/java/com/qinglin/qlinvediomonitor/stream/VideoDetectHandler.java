@@ -3,6 +3,7 @@ package com.qinglin.qlinvediomonitor.stream;
 import com.qinglin.qlinvediomonitor.model.FrameResult;
 import com.qinglin.qlinvediomonitor.stream.detect.DetectService;
 import lombok.extern.slf4j.Slf4j;
+import org.bytedeco.javacpp.opencv_core.*;
 import org.bytedeco.javacv.Frame;
 
 /**
@@ -17,7 +18,6 @@ public class VideoDetectHandler {
 
     private HandlerNode cur;
     private HandlerNode head;
-
 
 
     public VideoDetectHandler addHandler(DetectService detectService) {
@@ -53,6 +53,20 @@ public class VideoDetectHandler {
         return frameResult;
     }
 
+    public FrameResult detect(Mat frontFrame, Mat afterFrame) {
+        FrameResult frameResult = null;
+        cur = head;
+        while (cur != null) {
+            frameResult = cur.handle(frontFrame,afterFrame);
+            if (frameResult.isSuccess()) {
+                // 检测成功，直接返回
+                return frameResult;
+            }
+            cur = cur.next;
+        }
+        return frameResult;
+    }
+
 
     static class HandlerNode {
         private DetectService detectService;
@@ -66,6 +80,9 @@ public class VideoDetectHandler {
             return detectService.convert(frame);
         }
 
+        public FrameResult handle(Mat frontFrame,Mat afterFrame) {
+            return detectService.detect(frontFrame,afterFrame);
+        }
 
         public boolean release(){
             try {

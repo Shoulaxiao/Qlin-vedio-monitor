@@ -1,15 +1,12 @@
 package com.qinglin.qlinvediomonitor.stream.detect;
 
-import com.qinglin.qlinvediomonitor.enums.VideoTypeEnum;
 import com.qinglin.qlinvediomonitor.model.FrameResult;
-import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.javacpp.opencv_core.*;
 import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
 
 import static org.bytedeco.javacpp.opencv_core.CV_8UC1;
-import static org.bytedeco.javacpp.opencv_imgproc.*;
 
 
 /**
@@ -70,4 +67,11 @@ public interface DetectService {
      */
     void releaseOutputResource();
 
+    /**
+     * 检测两帧之间的是否发生变化
+     * @param frontFrame
+     * @param afterFrame
+     * @return
+     */
+    FrameResult detect(Mat frontFrame, Mat afterFrame);
 }

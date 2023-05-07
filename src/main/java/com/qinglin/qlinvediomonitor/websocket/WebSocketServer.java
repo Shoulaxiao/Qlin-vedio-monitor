@@ -92,7 +92,6 @@ public class WebSocketServer {
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-        System.out.println("用户消息:" + userId + ",报文:" + message);
         if (StringUtils.isNotBlank(message)) {
             try {
                 //解析发送的报文

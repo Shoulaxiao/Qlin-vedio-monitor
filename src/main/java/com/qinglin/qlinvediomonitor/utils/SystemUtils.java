@@ -11,6 +11,9 @@ import java.io.File;
  */
 public class SystemUtils {
 
+    public static String WEB_STATIC_IMG = null;
+    public static String WEB_STATIC_IMG_LOCAL = null;
+
     /**
      * 判断操作系统是否是 Windows
      *
@@ -26,11 +29,12 @@ public class SystemUtils {
         File[] parts = File.listRoots();
         File path = parts[parts.length - 1];
         if (isWindows()){
-            return path.getAbsolutePath() + "\\temp";
+            return path.getAbsolutePath() + "temp\\";
         }else {
-            return path.getAbsolutePath()+"temp";
+            return path.getAbsolutePath()+"temp/";
         }
     }
+
 
     /**
      * 判断操作系统是否是 MacOS
@@ -65,7 +69,12 @@ public class SystemUtils {
         return System.getProperty("os.name");
     }
 
-    public static void main(String[] args) {
-        isWindows();
+    public static void load() {
+        String pathPrefix = System.getProperty("user.dir");
+        if (isWindows()){
+            WEB_STATIC_IMG_LOCAL = pathPrefix + "\\src\\main\\resources\\static\\video\\preViewImages\\";
+        }else {
+            WEB_STATIC_IMG_LOCAL = pathPrefix + "/src/main/resources/static/video/preViewImages/";
+        }
     }
 }

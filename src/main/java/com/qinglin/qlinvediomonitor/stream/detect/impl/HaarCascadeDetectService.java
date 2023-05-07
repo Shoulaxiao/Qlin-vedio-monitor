@@ -5,17 +5,12 @@ import com.qinglin.qlinvediomonitor.model.FrameResult;
 import com.qinglin.qlinvediomonitor.stream.detect.AbstractVideoDetect;
 import com.qinglin.qlinvediomonitor.stream.detect.DetectService;
 import lombok.extern.slf4j.Slf4j;
-import org.bytedeco.javacpp.Loader;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.net.URL;
 
 /**
  * @author willzhao
@@ -24,7 +19,6 @@ import java.net.URL;
  * @date 2021/12/3 8:09
  */
 @Slf4j
-//@Service("haarCascadeDetectService")
 public class HaarCascadeDetectService extends AbstractVideoDetect {
 
     private VideoTypeEnum videoType;
@@ -61,11 +55,6 @@ public class HaarCascadeDetectService extends AbstractVideoDetect {
     public HaarCascadeDetectService(String modelFileUrl, VideoTypeEnum videoType) throws Exception {
         this.modelFileUrl = modelFileUrl;
         this.videoType = videoType;
-        this.init();
-    }
-
-    public HaarCascadeDetectService(String modelFileUrl) throws Exception {
-        this.modelFileUrl = modelFileUrl;
         this.init();
     }
 
@@ -120,5 +109,10 @@ public class HaarCascadeDetectService extends AbstractVideoDetect {
         if (null == classifier) {
             classifier.close();
         }
+    }
+
+    @Override
+    public FrameResult detect(Mat frontFrame, Mat afterFrame) {
+        return null;
     }
 }
