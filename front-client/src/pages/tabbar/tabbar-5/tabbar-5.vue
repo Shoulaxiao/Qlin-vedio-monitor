@@ -1,7 +1,7 @@
 <template>
-  <view class="content">
+  <view>
     <uni-section title="湿度" titleFontSize="18px" type="line">
-      <view class="canvas">
+      <view class="charts-box">
         <qiun-data-charts
             type="arcbar"
             :opts="opts"
@@ -12,7 +12,7 @@
     <uni-section title="湿度" titleFontSize="18px" type="line">
       <view class="charts-box">
         <qiun-data-charts
-            type="column"
+            type="gauge"
             :opts="optsTemperature"
             :chartData="chartDataTemperature"
         />
@@ -24,7 +24,6 @@
 
 <script>
 import ReconnectingWebSocket from 'reconnecting-websocket'
-import moment from "moment";
 
 export default {
   data() {
@@ -32,7 +31,7 @@ export default {
       title: 'Hello',
       heartbaet: null,
       chartData: {},
-      chartDataTemperature:{},
+      chartDataTemperature: {},
       opts: {
         color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
         padding: undefined,
@@ -59,32 +58,42 @@ export default {
         }
       },
       optsTemperature: {
-        color: ["#1890FF","#91CB74","#FAC858","#EE6666","#73C0DE","#3CA272","#FC8452","#9A60B4","#ea7ccc"],
-        padding: [15,15,0,5],
-        enableScroll: false,
-        legend: {
-          show: false
+        color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
+        padding: undefined,
+        title: {
+          name: "60℃",
+          fontSize: 25,
+          color: "#2fc25b",
+          offsetY: 50
         },
-        xAxis: {
-          disableGrid: true
-        },
-        yAxis: {
-          data: [
-            {
-              min: -40,
-              max: 40
-            }
-          ],
-          splitNumber: 4
+        subtitle: {
+          name: "当前温度",
+          fontSize: 15,
+          color: "#666666",
+          offsetY: -50
         },
         extra: {
-          column: {
-            type: "group",
+          gauge: {
+            type: "default",
             width: 30,
-            activeBgColor: "#000000",
-            activeBgOpacity: 0.08,
-            barBorderCircle: true,
-            linearType: "custom"
+            labelColor: "#666666",
+            startAngle: 0.75,
+            endAngle: 0.25,
+            startNumber: 0,
+            endNumber: 100,
+            labelFormat: "",
+            splitLine: {
+              fixRadius: 0,
+              splitNumber: 10,
+              width: 30,
+              color: "#FFFFFF",
+              childNumber: 5,
+              childWidth: 12
+            },
+            pointer: {
+              width: 24,
+              color: "auto"
+            }
           }
         }
       }
@@ -117,14 +126,17 @@ export default {
 
         //模拟服务器返回数据，如果数据格式和标准格式不同，需自行按下面的格式拼接
         let resTemperature = {
-          categories: [moment().format("YYYY-MM-DD HH:mm")],
+          categories: [{"value": 0.2, "color": "#1890ff"}, {"value": 0.8, "color": "#2fc25b"}, {
+            "value": 1,
+            "color": "#f04864"
+          }],
           series: [
             {
               name: "温度",
-              data: [20]
+              data: 0.66
             }
           ]
-        };
+        }
         this.chartDataTemperature = JSON.parse(JSON.stringify(resTemperature));
       }, 500);
     },
@@ -208,6 +220,11 @@ export default {
 .content {
   /*width: 100%;*/
   /*height: 300px;*/
+}
+
+.humidty-canvase {
+  width: 50%;
+  margin: 20 rpx auto;
 }
 
 .canvas {
