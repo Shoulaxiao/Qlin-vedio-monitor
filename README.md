@@ -83,6 +83,11 @@ http {
 	server {
 		listen 8887;
 		
+		location /images {
+		    root /home/images;
+		    autoindex on;
+		}
+		
 		# Serve HLS fragments
 		location /hls {
 			types {

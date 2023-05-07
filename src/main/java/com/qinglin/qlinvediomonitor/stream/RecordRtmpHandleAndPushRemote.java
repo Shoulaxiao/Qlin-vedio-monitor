@@ -4,9 +4,13 @@ import com.qinglin.qlinvediomonitor.model.FrameResult;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacpp.avcodec;
 import org.bytedeco.javacpp.avformat;
-import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.opencv_core.*;
+import org.bytedeco.javacpp.opencv_imgproc;
 import org.bytedeco.javacv.*;
 import org.springframework.stereotype.Component;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Slf4j
 @Component(value = "recordRtmpHandleAndPushRemote")
@@ -16,7 +20,11 @@ public class RecordRtmpHandleAndPushRemote extends AbstractVideoApplication {
 
     protected long startRecordTime = 0L;
 
+    // 添加水印时用到的时间工具
+    private final SimpleDateFormat  simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    // 水印在图片上的位置
+    private Point point = new Point(15, 35);
     @Override
     protected void initOutput() throws Exception {
         // 实例化FFmpegFrameRecorder，将SRS的推送地址传入
@@ -72,14 +80,14 @@ public class RecordRtmpHandleAndPushRemote extends AbstractVideoApplication {
     }
 
     @Override
-    protected void output(Frame frame) throws Exception {
+    protected void output(FrameResult frame) throws Exception {
         if (0L == startRecordTime) {
             startRecordTime = System.currentTimeMillis();
         }
         // 时间戳
         recorder.setTimestamp(1000 * (System.currentTimeMillis() - startRecordTime));
         //推流
-        recorder.record(frame);
+        recorder.record(frame.getFrame());
     }
 
     @Override
@@ -94,25 +102,31 @@ public class RecordRtmpHandleAndPushRemote extends AbstractVideoApplication {
         return super.getInterval() / 4;
     }
 
-    /**
-     * 直播流不做处理，避免延迟
-     * @param frame
-     * @return
-     */
     @Override
-    protected FrameResult frameDetect(Frame frame) {
+    protected FrameResult frameHandle(Frame mat2Frame, Mat mat) {
         FrameResult frameResult = new FrameResult();
-        frameResult.setFrame(frame);
+        // 在图片上添加水印，水印内容是当前时间，位置是左上角
+        opencv_imgproc.putText(mat,
+                simpleDateFormat.format(new Date()),
+                point,
+                opencv_imgproc.CV_FONT_VECTOR0,
+                0.8,
+                new Scalar(255, 255, 255, 0),
+                2,
+                0,
+                false);
+        frameResult.setFrame(mat2Frame(mat));
+        frameResult.setSuccess(true);
         return frameResult;
     }
 
     @Override
-    protected opencv_core.IplImage frame2Img(Frame frame) {
+    protected IplImage frame2Img(Frame frame) {
         return Java2DFrameUtils.toIplImage(frame);
     }
 
     @Override
-    protected Frame mat2Frame(opencv_core.Mat mat) {
+    protected Frame mat2Frame(Mat mat) {
         return Java2DFrameUtils.toFrame(mat);
     }
 }

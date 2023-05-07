@@ -1,16 +1,16 @@
 package com.qinglin.qlinvediomonitor;
 
 
-import org.bytedeco.javacv.CanvasFrame;
-import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.FrameGrabber;
-import org.bytedeco.javacv.OpenCVFrameGrabber;
+import org.bytedeco.javacv.*;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ImgTest {
+
 
 
     public static void main(String[] args) throws  Exception, IOException {
@@ -30,4 +30,6 @@ public class ImgTest {
             Thread.sleep(50);	//50毫秒刷新一次图像
         }
     }
+
+
 }

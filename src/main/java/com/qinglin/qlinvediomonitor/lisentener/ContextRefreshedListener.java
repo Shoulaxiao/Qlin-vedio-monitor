@@ -3,6 +3,8 @@ package com.qinglin.qlinvediomonitor.lisentener;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.qinglin.qlinvediomonitor.stream.ActionConfig;
 import com.qinglin.qlinvediomonitor.stream.RecordRtmpHandleAndPushRemote;
+import com.qinglin.qlinvediomonitor.stream.RecordRtmpSaveMp4;
+import com.qinglin.qlinvediomonitor.utils.SystemUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
@@ -30,11 +32,17 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
     @Value("${stmp.server.address}")
     private String stmpRecordAddress;
 
-    @Value("${http.pull.stream.address}")
-    private String stmpPushAddress;
+    /**
+     * 监控摄像头视频流地址
+     */
+    @Value("${camera.stmp.server.address}")
+    private String stmpPullAddress;
 
     @Resource(name = "recordRtmpHandleAndPushRemote")
     private RecordRtmpHandleAndPushRemote recordRtmpHandleAndPushRemote;
+
+    @Resource
+    private RecordRtmpSaveMp4 recordRtmpSaveMp4;
 
 
     /**
@@ -44,13 +52,14 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        SystemUtils.load();
         log.info("开始直播推流");
         ActionConfig config = ActionConfig.builder()
                 .pushUrl(stmpRecordAddress)
-                .sourceUrl(MP4_FILE_PATH)
+                .sourceUrl(stmpPullAddress)
                 .cameraIndex(-1)
                 .build();
+        executorService.submit(() -> recordRtmpSaveMp4.action(config));
         executorService.submit(() -> recordRtmpHandleAndPushRemote.action(config));
-
     }
 }

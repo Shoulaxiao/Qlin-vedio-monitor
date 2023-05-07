@@ -14,6 +14,13 @@ import org.bytedeco.javacv.Frame;
 @Data
 public class FrameResult {
 
+    /**
+     * 是否进行开始或者终止动作
+     */
+    private boolean isMove;
+
+    private boolean isEnd;
+
     private Frame frame;
 
     /**
@@ -27,6 +34,11 @@ public class FrameResult {
     private VideoTypeEnum videoType;
 
     public FrameResult() {
+    }
+
+    public FrameResult(Frame frame, boolean success) {
+        this.frame = frame;
+        this.success = success;
     }
 
     public FrameResult(Frame frame, boolean success, VideoTypeEnum videoType) {

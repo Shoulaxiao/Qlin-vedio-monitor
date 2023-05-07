@@ -6,6 +6,8 @@ import com.qinglin.qlinvediomonitor.common.SingleResult;
 import com.qinglin.qlinvediomonitor.exception.MonitorException;
 import com.qinglin.qlinvediomonitor.exception.MonitorVideoErrorFactory;
 import com.qinglin.qlinvediomonitor.utils.ErrorUtil;
+import com.qinglin.qlinvediomonitor.utils.SystemUtils;
+import com.qinglin.qlinvediomonitor.utils.UrlUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;

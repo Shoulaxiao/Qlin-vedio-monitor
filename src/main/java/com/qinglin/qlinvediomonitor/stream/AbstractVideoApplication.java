@@ -7,11 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacpp.avutil;
-import org.bytedeco.javacpp.opencv_imgproc;
 import org.bytedeco.javacv.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.bytedeco.javacpp.opencv_core.*;
 
@@ -19,15 +16,12 @@ import org.bytedeco.javacpp.opencv_core.*;
 @Slf4j
 public abstract class AbstractVideoApplication {
 
+
     protected VideoDetectHandler videoDetectHandler;
 
 
     protected ActionConfig config;
 
-    /**
-     * 转换器
-     */
-    private final OpenCVFrameConverter.ToIplImage openCVConverter = new OpenCVFrameConverter.ToIplImage();
 
     /**
      * 摄像头序号，如果只有一个摄像头，那就是0
@@ -75,13 +69,17 @@ public abstract class AbstractVideoApplication {
     /**
      * 输出
      */
-    protected abstract void output(Frame frame) throws Exception;
+    protected abstract void output(FrameResult frame) throws Exception;
 
     /**
      * 释放输出操作相关的资源
      */
     protected abstract void releaseOutputResource() throws Exception;
 
+    /**
+     * 初始化检测链
+     * @throws Exception
+     */
     protected void initDetectHandler() throws Exception {
         // 检测服务的初始化操作
         videoDetectHandler = new VideoDetectHandler();
@@ -147,40 +145,26 @@ public abstract class AbstractVideoApplication {
      * @throws Exception
      */
     private void grabAndOutput() throws Exception {
-        // 添加水印时用到的时间工具
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // 两帧输出之间的间隔时间，默认是1000除以帧率，子类可酌情修改
         int interVal = getInterval();
-        // 水印在图片上的位置
-        Point point = new Point(15, 35);
-
         Frame captureFrame;
         IplImage img;
         Mat mat;
         // 超过指定时间就结束循环
         long startTime = System.currentTimeMillis();
         try {
+            FrameResult frameResult;
             while ((captureFrame = grabFrame()) != null) {
+                frameResult =  new FrameResult(captureFrame,true);
                 //添加水印
                 if (captureFrame.image != null) {
                     // 将帧对象转为IplImage对象
                     img = frame2Img(captureFrame);
                     // IplImage转mat
                     mat = new Mat(img);
-                    // 在图片上添加水印，水印内容是当前时间，位置是左上角
-                    opencv_imgproc.putText(mat,
-                            simpleDateFormat.format(new Date()),
-                            point,
-                            opencv_imgproc.CV_FONT_VECTOR0,
-                            0.8,
-                            new Scalar(255, 255, 255, 0),
-                            2,
-                            0,
-                            false);
-                    FrameResult frameResult = frameDetect(mat2Frame(mat));
-                    captureFrame = frameResult.getFrame();
+                    frameResult = frameHandle(captureFrame, mat);
                 }
-                output(captureFrame);
+                output(frameResult);
                 // 适当间隔，让肉感感受不到闪屏即可
                 if (interVal > 0) {
                     Thread.sleep(interVal);
@@ -193,10 +177,9 @@ public abstract class AbstractVideoApplication {
             log.info("推送完成，耗时[{}]秒",
                     (System.currentTimeMillis() - startTime) / 1000);
         }
-
     }
 
-    protected abstract FrameResult frameDetect(Frame mat2Frame);
+    protected abstract FrameResult frameHandle(Frame mat2Frame,Mat mat);
 
     protected abstract IplImage frame2Img(Frame frame);
 

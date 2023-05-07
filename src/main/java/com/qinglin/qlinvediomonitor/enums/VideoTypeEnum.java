@@ -11,7 +11,7 @@ public enum VideoTypeEnum {
     /**
      * 画面抖动
      */
-    PICTURE_MOVE(0, "画面抖动"),
+    PICTURE_MOVE(0, "画面运动"),
     STATIC(-1, "画面静止"),
     /**
      * 人物运动
