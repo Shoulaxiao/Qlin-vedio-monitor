@@ -260,7 +260,7 @@ public class RecordRtmpSaveMp4 extends AbstractVideoApplication implements Recor
         processRecordEnd(frameResult.getFrame());
         long endTime = System.currentTimeMillis();
         this.preViewUrl = null;
-        log.info("===结束录制{}.mp4，耗时=[{}]s===", fileName, (endTime - startTime) / 1000);
+        log.info("===结束录制{}.mp4，耗时=[{}]s===，位置：{}", fileName, (endTime - startTime) / 1000, RECORD_FILE_PATH + this.fileName + ".mp4");
     }
 
     @Override
