@@ -46,6 +46,7 @@ public class SensorInfoController {
             eventPublisher.publishEvent(new InfoEvent(this,JSON.toJSONString(socketResDTO)));
         } catch (Exception e) {
             log.error("发送传感器信息到客户端失败", e);
+            return new SingleResult<>(null, false, StringUtils.EMPTY, "发送传感器信息到客户端失败");
         }
         return new SingleResult<>(null, true, StringUtils.EMPTY, StringUtils.EMPTY);
     }

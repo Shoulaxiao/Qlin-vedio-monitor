@@ -45,6 +45,7 @@ public class AudioInfoController {
             eventPublisher.publishEvent(new InfoEvent(this, JSON.toJSONString(socketResDTO)));
         } catch (Exception e) {
             log.error("发送到前端展示失败", e);
+            return new SingleResult<>(null, false, StringUtils.EMPTY, "发送到前端展示失败");
         }
         return new SingleResult<>(null, true, StringUtils.EMPTY, StringUtils.EMPTY);
     }
