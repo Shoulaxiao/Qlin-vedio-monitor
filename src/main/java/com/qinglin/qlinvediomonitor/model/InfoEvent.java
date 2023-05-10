@@ -12,7 +12,7 @@ import java.time.Clock;
  * @Description
  * @date 2023/5/6 22:17
  */
-public class SensorEvent extends ApplicationEvent {
+public class InfoEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = -8451336151994081480L;
     private String msg;
@@ -25,16 +25,16 @@ public class SensorEvent extends ApplicationEvent {
         this.msg = msg;
     }
 
-    public SensorEvent(Object source) {
+    public InfoEvent(Object source) {
         super(source);
     }
 
-    public SensorEvent(Object source, String msg) {
+    public InfoEvent(Object source, String msg) {
         super(source);
         this.msg = msg;
     }
 
-    public SensorEvent(Object source, Clock clock, String msg) {
+    public InfoEvent(Object source, Clock clock, String msg) {
         super(source, clock);
         this.msg = msg;
     }

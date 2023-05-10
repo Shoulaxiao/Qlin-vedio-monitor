@@ -1,6 +1,6 @@
 package com.qinglin.qlinvediomonitor.lisentener;
 
-import com.qinglin.qlinvediomonitor.model.SensorEvent;
+import com.qinglin.qlinvediomonitor.model.InfoEvent;
 import com.qinglin.qlinvediomonitor.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -12,10 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
-public class SensorEventListener implements ApplicationListener<SensorEvent> {
+public class SensorAndAudioEventListener implements ApplicationListener<InfoEvent> {
 
     @Override
-    public void onApplicationEvent(SensorEvent event) {
+    public void onApplicationEvent(InfoEvent event) {
         try {
             ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getWebSocketMap();
             for (Map.Entry<String,WebSocketServer> entry:webSocketMap.entrySet()){
