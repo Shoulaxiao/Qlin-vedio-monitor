@@ -33,7 +33,7 @@ public class AudioInfoController {
     @Resource
     private ApplicationEventPublisher eventPublisher;
 
-    @RequestMapping(value = "/audio")
+    @RequestMapping(value = "/info")
     @ResponseBody
     public SingleResult<String> audio(@RequestBody AudioInfoReq req) {
         log.info("获取到的电位值为：{}", req.getElectricValue());
